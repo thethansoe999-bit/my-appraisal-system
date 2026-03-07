@@ -104,13 +104,13 @@
         }
     }
 
-    function renderTable(rows) {
+   function renderTable(rows) {
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         
         const headerHTML = `<tr class="emp-header-row">
-            <th style="width: 50px;">No.</th>
-            <th style="width: 100px;">Week</th>
+            <th style="width: 30px;">No.</th>
+            <th style="width: 80px;">Week</th>
             <th>မှီခိုအားထားနိုင်ခြင်း နှင့် ယုံကြည်စိတ်ချရခြင်း<br>(Dependable and Reliable)</th>
             <th>ဝန်ဆောင်မှု ကောင်းမွန်ခြင်း<br>(Good Customer Service)</th>
             <th>တာဝန်ယူတတ်ခြင်း နှင့် စိတ်နေသဘောထား<br>(Accountable and Good Attitude)</th>
@@ -132,7 +132,15 @@
             if (isNameRow) {
                 const trName = document.createElement('tr');
                 trName.className = 'emp-name-row';
-                trName.innerHTML = `<td colspan="8">${cell0}</td>`;
+                // အမည်ကို Edit လုပ်လို့ရအောင် ပြင်ဆင်ခြင်း
+                const tdName = document.createElement('td');
+                tdName.colSpan = 8;
+                tdName.textContent = cell0;
+                tdName.contentEditable = true;
+                tdName.className = 'editable'; // Hover effect ရစေရန်
+                tdName.onblur = () => updateSheet(rowIndex + 2, 1, tdName.textContent.trim()); // Column 1 (A) ကို Update လုပ်ရန်
+                
+                trName.appendChild(tdName);
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
                 currentNo = ""; 
@@ -143,7 +151,6 @@
                 if (isTotalRow) tr.className = 'total-row';
 
                 for (let i = 0; i < 8; i++) {
-                    // Column A (No.) အတွက် Merge Logic
                     if (i === 0 && !isTotalRow && row[1]) {
                         if (cell0 !== "" && cell0 !== currentNo) {
                             const td = document.createElement('td');
@@ -158,19 +165,17 @@
                         continue; 
                     }
 
-                    // Row No. (12, 13, 14) စသည့် Total Row များအတွက် Column A နှင့် B ကို Merge လုပ်ခြင်း
                     if (isTotalRow && i === 0) {
                         const td = document.createElement('td');
-                        td.colSpan = 2; // Column A နှင့် B ကို ပေါင်းခြင်း
+                        td.colSpan = 2; 
                         td.textContent = cell0;
                         td.style.fontWeight = "bold";
-                        td.style.textAlign = "center"; // စာသားကို Center ထားခြင်း
+                        td.style.textAlign = "center";
                         td.style.verticalAlign = "middle";
                         tr.appendChild(td);
                         continue; 
                     }
                     
-                    // Column B ကို ကျော်သွားရန် (A နဲ့ Merge လုပ်ထားလို့)
                     if (isTotalRow && i === 1) continue;
 
                     const td = document.createElement('td');
