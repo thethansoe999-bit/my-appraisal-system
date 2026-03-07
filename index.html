@@ -119,8 +119,8 @@
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const cell1 = row[1] ? String(row[1]).trim() : "";
             
-            // ၁။ Header Row အပိုများနှင့် "Total Average Bonus" စာသားသီးသန့် Row များကို ဖယ်ထုတ်ခြင်း
-            if (cell0 === "No." || cell1 === "Week" || cell0.includes("Total Average Bonus")) {
+            // ၁။ Header Row အပိုများကိုသာ ဖယ်ထုတ်ပါမည် (Total Average Bonus ကို မဖယ်တော့ပါ)
+            if (cell0 === "No." || cell1 === "Week") {
                 return;
             }
 
@@ -132,7 +132,7 @@
                 trName.innerHTML = `<td colspan="8">${cell0}</td>`;
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
-            } else if (row[1] || cell0.includes("Total") || cell0.includes("Average")) {
+            } else if (row[1] || cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း")) {
                 const tr = document.createElement('tr');
                 const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
                 
@@ -142,10 +142,11 @@
                     const td = document.createElement('td');
                     let val = row[i] || '';
 
-                    // ၂။ "ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း" ကို Thingyan Moe ပုံစံအတိုင်း Row တစ်ခုတည်းဖြစ်အောင် ညှိခြင်း
-                    if (i === 0 && cell0.includes("ပျမ်းမျှ") && cell0.includes("စုစုပေါင်း")) {
-                        td.textContent = "ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း (Total Average Bonus)";
-                        td.style.fontWeight = "bold";
+                    // ၂။ Total Average Bonus Row အတွက် ပုံစံညှိခြင်း (နမူနာပုံအတိုင်း)
+                    if (isTotalRow && cell0.includes("စုစုပေါင်း") && i === 0) {
+                        td.textContent = cell0; // "ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း (Total Average Bonus)"
+                        td.style.textAlign = "left";
+                        td.style.paddingLeft = "10px";
                     } else {
                         td.textContent = val;
                     }
