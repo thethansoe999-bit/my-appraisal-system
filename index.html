@@ -7,60 +7,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --teal-dark: #00796b; --teal-main: #009688; --teal-light: #e0f2f1; --teal-header: #b2dfdb; }
-        body { font-family: 'Pyidaungsu', sans-serif; background-color: #f0f4f3; margin: 0; padding: 20px; }
-        .container { max-width: 1350px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .header-title { text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; }
-        
-        .filter-group { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 25px; 
-            justify-content: space-between; 
-            flex-wrap: nowrap; 
-        }
-        .filter-btn, .print-btn { 
-            flex: 1; 
-            padding: 12px 5px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-family: 'Pyidaungsu', sans-serif; 
-            font-size: 15px;
-            transition: all 0.3s ease; 
-            border: 2px solid #ddd;
-            background: white;
-            color: #333;
-            text-align: center;
-        }
+    body { font-family: 'Pyidaungsu', sans-serif; background-color: #f0f4f3; margin: 0; padding: 20px; }
+    
+    /* A3 Landscape အတွက် Container ကို အကျယ်ချဲ့ခြင်း */
+    .container { 
+        max-width: 1550px; 
+        margin: auto; 
+        background: white; 
+        padding: 30px; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    }
+    
+    .header-title { text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; }
+    
+    .filter-group { display: flex; gap: 15px; margin-bottom: 25px; justify-content: space-between; flex-wrap: nowrap; }
+    .filter-btn, .print-btn { flex: 1; padding: 12px 5px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Pyidaungsu', sans-serif; font-size: 15px; transition: all 0.3s ease; border: 2px solid #ddd; background: white; color: #333; text-align: center; }
 
-        .btn-all:hover { background-color: #2196F3 !important; color: white !important; border-color: #2196F3; }
-        .btn-reliable:hover { background-color: #4CAF50 !important; color: white !important; border-color: #4CAF50; }
-        .btn-unreliable:hover { background-color: #f44336 !important; color: white !important; border-color: #f44336; }
-        .print-btn:hover { background-color: #795548 !important; color: white !important; border-color: #795548; }
+    .btn-all:hover { background-color: #2196F3 !important; color: white !important; border-color: #2196F3; }
+    .btn-reliable:hover { background-color: #4CAF50 !important; color: white !important; border-color: #4CAF50; }
+    .btn-unreliable:hover { background-color: #f44336 !important; color: white !important; border-color: #f44336; }
+    .print-btn:hover { background-color: #795548 !important; color: white !important; border-color: #795548; }
 
-        .filter-btn.active { background-color: var(--teal-main); color: white; border-color: var(--teal-main); }
-        .print-btn { background: #43a047; color: white; border: none; }
+    .filter-btn.active { background-color: var(--teal-main); color: white; border-color: var(--teal-main); }
+    .print-btn { background: #43a047; color: white; border: none; }
 
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        .emp-name-row td { background-color: var(--teal-light); color: var(--teal-dark); font-size: 24px; font-weight: bold; padding: 15px; border: 2px solid var(--teal-main); text-align: center; }
-        
-        /* Header Row ကို စာသားရှည်များအတွက် ပြင်ဆင်ခြင်း */
-        .emp-header-row th { 
-            background-color: var(--teal-header); 
-            color: var(--teal-dark); 
-            padding: 8px 4px; 
-            font-size: 12px; 
-            border: 1px solid #90a4ae; 
-            height: 100px; 
-            vertical-align: middle;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-        
-        td { border: 1px solid #cfd8dc; text-align: center; vertical-align: middle; height: 40px; font-size: 14px; }
-        .total-row td { background-color: #f9f9f9; font-weight: bold; }
-        .editable:hover { background-color: #fff9c4 !important; outline: 2px solid var(--teal-main); cursor: cell; }
-        #status-msg { text-align: center; padding: 10px; font-weight: bold; color: var(--teal-dark); font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; } /* table-layout: fixed က Column အကျယ်ကို ပုံသေဖြစ်စေသည် */
+    
+    .emp-name-row td { background-color: var(--teal-light); color: var(--teal-dark); font-size: 24px; font-weight: bold; padding: 15px; border: 2px solid var(--teal-main); text-align: center; }
+    
+    /* Column အကျယ်များကို တစ်ပြေးညီ ချိန်ညှိခြင်း */
+    .emp-header-row th:nth-child(1) { width: 50px; } /* No. */
+    .emp-header-row th:nth-child(2) { width: 100px; } /* Week */
+    
+    /* Column C မှ H အထိ (၃ ခုမြောက်မှ ၈ ခုမြောက်အထိ) ကို အကျယ် ညီညာအောင် ထားခြင်း */
+    .emp-header-row th:nth-child(n+3) { width: auto; } 
+
+    .emp-header-row th { 
+        background-color: var(--teal-header); 
+        color: var(--teal-dark); 
+        padding: 8px 4px; 
+        font-size: 13px; 
+        border: 1px solid #90a4ae; 
+        height: 110px; 
+        vertical-align: middle;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+    
+    td { border: 1px solid #cfd8dc; text-align: center; vertical-align: middle; height: 45px; font-size: 14px; overflow: hidden; }
+    .total-row td { background-color: #f9f9f9; font-weight: bold; }
+    .editable:hover { background-color: #fff9c4 !important; outline: 2px solid var(--teal-main); cursor: cell; }
+    #status-msg { text-align: center; padding: 10px; font-weight: bold; color: var(--teal-dark); font-size: 18px; }
+
+    /* Print ထုတ်သည့်အခါ A3 Landscape ဖြစ်စေရန် */
+    @media print {
+        @page { size: A3 landscape; margin: 1cm; }
+        body { padding: 0; background: white; }
+        .container { box-shadow: none; max-width: 100%; padding: 0; }
+        .filter-group { display: none; } /* Print ထုတ်ရင် ခလုတ်တွေ ဖျောက်ထားမည် */
+    }
     </style>
 </head>
 <body>
