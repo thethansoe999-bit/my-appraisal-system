@@ -11,7 +11,6 @@
         .container { max-width: 1350px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .header-title { text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; }
         
-        /* အချက် (၂) အရ ခလုတ်များ၏ Alignment နှင့် အကွာအဝေးကို ပြင်ဆင်ခြင်း */
         .filter-group { 
             display: flex; 
             gap: 15px; 
@@ -34,7 +33,6 @@
             text-align: center;
         }
 
-        /* အချက် (၂) အရ Hover လုပ်လျှင် အရောင်ပြောင်းလဲခြင်း */
         .btn-all:hover { background-color: #2196F3 !important; color: white !important; border-color: #2196F3; }
         .btn-reliable:hover { background-color: #4CAF50 !important; color: white !important; border-color: #4CAF50; }
         .btn-unreliable:hover { background-color: #f44336 !important; color: white !important; border-color: #f44336; }
@@ -45,7 +43,20 @@
 
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
         .emp-name-row td { background-color: var(--teal-light); color: var(--teal-dark); font-size: 24px; font-weight: bold; padding: 15px; border: 2px solid var(--teal-main); text-align: center; }
-        .emp-header-row th { background-color: var(--teal-header); color: var(--teal-dark); padding: 12px 5px; font-size: 11px; border: 1px solid #90a4ae; height: 80px; vertical-align: middle; }
+        
+        /* Header Row ကို စာသားရှည်များအတွက် ပြင်ဆင်ခြင်း */
+        .emp-header-row th { 
+            background-color: var(--teal-header); 
+            color: var(--teal-dark); 
+            padding: 8px 4px; 
+            font-size: 12px; 
+            border: 1px solid #90a4ae; 
+            height: 100px; 
+            vertical-align: middle;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
         td { border: 1px solid #cfd8dc; text-align: center; vertical-align: middle; height: 40px; font-size: 14px; }
         .total-row td { background-color: #f9f9f9; font-weight: bold; }
         .editable:hover { background-color: #fff9c4 !important; outline: 2px solid var(--teal-main); cursor: cell; }
@@ -92,11 +103,17 @@
     function renderTable(rows) {
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
+        
+        // အချက် (၃) အရ Header စာသားများကို မြန်မာလို အစားထိုးခြင်း
         const headerHTML = `<tr class="emp-header-row">
-            <th>No.</th><th>Week</th>
-            <th>Dependable</th><th>Service</th>
-            <th>Attitude</th><th>Communication</th>
-            <th>Grooming</th><th>Disciplinarian</th>
+            <th style="width: 40px;">No.</th>
+            <th style="width: 80px;">Week</th>
+            <th>မှီခိုအားထားနိုင်ခြင်း နှင့် ယုံကြည်စိတ်ချရခြင်း<br>(Dependable and Reliable)</th>
+            <th>ဝန်ဆောင်မှု ကောင်းမွန်ခြင်း<br>(Good Customer Service)</th>
+            <th>တာဝန်ယူတတ်ခြင်း နှင့် စိတ်နေသဘောထား<br>(Accountable and Good Attitude)</th>
+            <th>လူအများနှင့် လိုက်လျောညီထွေ ပြောဆိုနေထိုင်တတ်မှု<br>(Good Communication)</th>
+            <th>သပ်ရပ်သန့်ရှင်းစွာ နေထိုင်တတ်ခြင်း<br>(Personal Grooming)</th>
+            <th>စည်းကမ်းလိုက်နာမှု<br>(Disciplinarian)</th>
         </tr>`;
 
         rows.forEach((row, rowIndex) => {
