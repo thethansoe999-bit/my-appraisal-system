@@ -10,11 +10,39 @@
         body { font-family: 'Pyidaungsu', sans-serif; background-color: #f0f4f3; margin: 0; padding: 20px; }
         .container { max-width: 1350px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .header-title { text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; }
-        .filter-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .filter-btn, .print-btn { padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Pyidaungsu', sans-serif; border: 2px solid var(--teal-main); }
-        .filter-btn { background: white; color: var(--teal-main); }
-        .filter-btn.active { background: var(--teal-main); color: white; }
-        .print-btn { background: #43a047; color: white; border: none; margin-left: auto; }
+        
+        /* အချက် (၂) အရ ခလုတ်များ၏ Alignment နှင့် အကွာအဝေးကို ပြင်ဆင်ခြင်း */
+        .filter-group { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+            justify-content: space-between; 
+            flex-wrap: nowrap; 
+        }
+        .filter-btn, .print-btn { 
+            flex: 1; 
+            padding: 12px 5px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-family: 'Pyidaungsu', sans-serif; 
+            font-size: 15px;
+            transition: all 0.3s ease; 
+            border: 2px solid #ddd;
+            background: white;
+            color: #333;
+            text-align: center;
+        }
+
+        /* အချက် (၂) အရ Hover လုပ်လျှင် အရောင်ပြောင်းလဲခြင်း */
+        .btn-all:hover { background-color: #2196F3 !important; color: white !important; border-color: #2196F3; }
+        .btn-reliable:hover { background-color: #4CAF50 !important; color: white !important; border-color: #4CAF50; }
+        .btn-unreliable:hover { background-color: #f44336 !important; color: white !important; border-color: #f44336; }
+        .print-btn:hover { background-color: #795548 !important; color: white !important; border-color: #795548; }
+
+        .filter-btn.active { background-color: var(--teal-main); color: white; border-color: var(--teal-main); }
+        .print-btn { background: #43a047; color: white; border: none; }
+
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
         .emp-name-row td { background-color: var(--teal-light); color: var(--teal-dark); font-size: 24px; font-weight: bold; padding: 15px; border: 2px solid var(--teal-main); text-align: center; }
         .emp-header-row th { background-color: var(--teal-header); color: var(--teal-dark); padding: 12px 5px; font-size: 11px; border: 1px solid #90a4ae; height: 80px; vertical-align: middle; }
@@ -29,9 +57,9 @@
 <div class="container">
     <div class="header-title">Appraisal Form For Trustworthy Bonus</div>
     <div class="filter-group">
-        <button class="filter-btn active" onclick="filterData('all', this)">All Employees</button>
-        <button class="filter-btn" onclick="filterData('5', this)">Reliable Employees</button>
-        <button class="filter-btn" onclick="filterData('low', this)">Unreliable Employees</button>
+        <button class="filter-btn active btn-all" onclick="filterData('all', this)">All Employees</button>
+        <button class="filter-btn btn-reliable" onclick="filterData('5', this)">Reliable Employees</button>
+        <button class="filter-btn btn-unreliable" onclick="filterData('low', this)">Unreliable Employees</button>
         <button class="print-btn" onclick="window.print()">Print Report</button>
     </div>
     <div id="status-msg">ဒေတာများကို ချိတ်ဆက်နေပါသည်...</div>
@@ -44,7 +72,6 @@
     const SPREADSHEET_ID = '1CKh9lQ7Z3hV65IeSNyn3IhsUXFrxO4XfC8bbTsJ084A';
     const API_KEY = 'AIzaSyDXEoPAFqagxCdOBJgnRaEPAf-fIEPgnIY';
     const SHEET_NAME = 'Jan'; 
-    // လူကြီးမင်း၏ Apps Script Web App URL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzXLqm4_MT9iQi4fezcJ-Pd0dih2vBNemfWoyX0bKbgRGSRFy7NhXe2e7xLtUNcnuve/exec";
 
     async function fetchData() {
@@ -117,7 +144,6 @@
     function filterData(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        // Filter logic can be added here
     }
 
     fetchData();
