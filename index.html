@@ -191,12 +191,25 @@
     async function updateSheet(r, c, v) {
         const status = document.getElementById('status-msg');
         status.style.display = 'block';
-        status.textContent = 'Updating Google Sheets...';
+        status.textContent = 'ဒေတာများကို သိမ်းဆည်းပြီး ပြန်လည်တွက်ချက်နေပါသည်...';
+        
         try {
-            await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`, { mode: 'no-cors' });
-            status.textContent = 'Saved Successfully!';
-            setTimeout(() => status.style.display = 'none', 1500);
-        } catch (e) { status.textContent = 'Error saving data.'; }
+            // ၁။ Google Sheet ဆီသို့ အမှတ်အသစ်ကို ပို့လွှတ်ခြင်း
+            const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
+            
+            if (response.ok) {
+                status.textContent = 'သိမ်းဆည်းမှု အောင်မြင်ပြီး ဒေတာများ Sync ဖြစ်သွားပါပြီ။';
+                
+                // ၂။ Formula တွက်ချက်ပြီးသား အဖြေအသစ်များကို Google Sheet မှ ပြန်လည်ရယူခြင်း (Real-time Sync)
+                setTimeout(async () => {
+                    await fetchData(); // ဒေတာအသစ်များကို ပြန်ဆွဲထုတ်ပြီး ဇယားကို Update လုပ်ခြင်း
+                    status.style.display = 'none';
+                }, 1000); // Sheet ဘက်က Formula တွက်ချိန် ၁ စက္ကန့်ပေးခြင်း
+            }
+        } catch (e) {
+            status.textContent = 'Error: ဒေတာသိမ်းဆည်းမှု မအောင်မြင်ပါ။';
+            console.error(e);
+        }
     }
 
     function filterData(type, btn) {
