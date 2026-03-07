@@ -6,33 +6,20 @@
     <title>Appraisal Form For Trustworthy Bonus</title>
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --teal-dark: #00796b;
-            --teal-main: #009688;
-            --teal-light: #e0f2f1;
-            --teal-header: #b2dfdb;
-        }
-
+        :root { --teal-dark: #00796b; --teal-main: #009688; --teal-light: #e0f2f1; --teal-header: #b2dfdb; }
         body { font-family: 'Pyidaungsu', sans-serif; background-color: #f0f4f3; margin: 0; padding: 20px; }
         .container { max-width: 1350px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        
-        /* ခေါင်းစဉ်ကြီး Font Size 36px */
-        .header-title { 
-            text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; 
-            margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; 
-        }
-
+        .header-title { text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; }
         .filter-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .filter-btn, .print-btn { padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Pyidaungsu', sans-serif; border: 2px solid var(--teal-main); }
         .filter-btn { background: white; color: var(--teal-main); }
         .filter-btn.active { background: var(--teal-main); color: white; }
         .print-btn { background: #43a047; color: white; border: none; margin-left: auto; }
-
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
         .emp-name-row td { background-color: var(--teal-light); color: var(--teal-dark); font-size: 24px; font-weight: bold; padding: 15px; border: 2px solid var(--teal-main); text-align: center; }
-        .emp-header-row th { background-color: var(--teal-header); color: var(--teal-dark); padding: 12px 5px; font-size: 11px; border: 1px solid #90a4ae; height: 80px; }
+        .emp-header-row th { background-color: var(--teal-header); color: var(--teal-dark); padding: 12px 5px; font-size: 11px; border: 1px solid #90a4ae; height: 80px; vertical-align: middle; }
         td { border: 1px solid #cfd8dc; text-align: center; vertical-align: middle; height: 40px; font-size: 14px; }
-        
+        .total-row td { background-color: #f9f9f9; font-weight: bold; }
         .editable:hover { background-color: #fff9c4 !important; outline: 2px solid var(--teal-main); cursor: cell; }
         #status-msg { text-align: center; padding: 10px; font-weight: bold; color: var(--teal-dark); font-size: 18px; }
     </style>
@@ -41,21 +28,99 @@
 
 <div class="container">
     <div class="header-title">Appraisal Form For Trustworthy Bonus</div>
-    
     <div class="filter-group">
-        <button class="filter-btn active">Show All</button>
-        <button class="filter-btn">Reliable</button>
-        <button class="filter-btn">Unreliable</button>
+        <button class="filter-btn active" onclick="filterData('all', this)">အားလုံးပြရန်</button>
+        <button class="filter-btn" onclick="filterData('5', this)">Reliable (၅ မှတ်)</button>
+        <button class="filter-btn" onclick="filterData('low', this)">Unreliable (၂ မှတ်အောက်)</button>
         <button class="print-btn" onclick="window.print()">Print Report</button>
     </div>
-
-    <div id="status-msg">ဒေတာများကို ချိတ်ဆက်ရန် ပြင်ဆင်နေပါသည်...</div>
-    
-    <table id="appraisalTable">
-        <tbody id="tableBody">
-            </tbody>
+    <div id="status-msg">ဒေတာများကို ချိတ်ဆက်နေပါသည်...</div>
+    <table id="appraisalTable" style="display:none;">
+        <tbody id="tableBody"></tbody>
     </table>
 </div>
 
+<script>
+    const SPREADSHEET_ID = '1CKh9lQ7Z3hV65IeSNyn3IhsUXFrxO4XfC8bbTsJ084A';
+    const API_KEY = 'AIzaSyDXEoPAFqagxCdOBJgnRaEPAf-fIEPgnIY';
+    const SHEET_NAME = 'Jan'; 
+    // လူကြီးမင်း၏ Apps Script Web App URL
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzXLqm4_MT9iQi4fezcJ-Pd0dih2vBNemfWoyX0bKbgRGSRFy7NhXe2e7xLtUNcnuve/exec";
+
+    async function fetchData() {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A2:H500?key=${API_KEY}`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.values) {
+                document.getElementById('status-msg').style.display = 'none';
+                document.getElementById('appraisalTable').style.display = 'table';
+                renderTable(data.values);
+            }
+        } catch (error) {
+            document.getElementById('status-msg').textContent = 'ဒေတာချိတ်ဆက်မှု မအောင်မြင်ပါ။ (Internet သို့မဟုတ် API Key စစ်ဆေးပါ)';
+        }
+    }
+
+    function renderTable(rows) {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        const headerHTML = `<tr class="emp-header-row">
+            <th>No.</th><th>Week</th>
+            <th>Dependable</th><th>Service</th>
+            <th>Attitude</th><th>Communication</th>
+            <th>Grooming</th><th>Disciplinarian</th>
+        </tr>`;
+
+        rows.forEach((row, rowIndex) => {
+            const cell0 = row[0] ? String(row[0]).trim() : "";
+            const isNameRow = cell0 && !row[1] && !row[2];
+
+            if (isNameRow) {
+                const trName = document.createElement('tr');
+                trName.className = 'emp-name-row';
+                trName.innerHTML = `<td colspan="8">${cell0}</td>`;
+                tableBody.appendChild(trName);
+                tableBody.insertAdjacentHTML('beforeend', headerHTML);
+            } else if (row[1] || cell0.includes("Total") || cell0.includes("Average")) {
+                const tr = document.createElement('tr');
+                const isTotal = cell0.includes("Total") || cell0.includes("Average");
+                if (isTotal) tr.className = 'total-row';
+
+                for (let i = 0; i < 8; i++) {
+                    const td = document.createElement('td');
+                    const val = row[i] || '';
+                    td.textContent = val;
+                    if (i >= 2 && i <= 7 && !isTotal && row[1]) {
+                        td.className = 'editable';
+                        td.contentEditable = true;
+                        td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
+                    }
+                    tr.appendChild(td);
+                }
+                tableBody.appendChild(tr);
+            }
+        });
+    }
+
+    async function updateSheet(r, c, v) {
+        const status = document.getElementById('status-msg');
+        status.style.display = 'block';
+        status.textContent = 'Updating Google Sheets...';
+        try {
+            await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`, { mode: 'no-cors' });
+            status.textContent = 'Saved Successfully!';
+            setTimeout(() => status.style.display = 'none', 1500);
+        } catch (e) { status.textContent = 'Error saving data.'; }
+    }
+
+    function filterData(type, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // Filter logic can be added here
+    }
+
+    fetchData();
+</script>
 </body>
 </html>
