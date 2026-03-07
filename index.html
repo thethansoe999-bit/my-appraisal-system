@@ -104,7 +104,6 @@
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         
-        // အချက် (၃) အရ Header စာသားများကို မြန်မာလို အစားထိုးခြင်း
         const headerHTML = `<tr class="emp-header-row">
             <th style="width: 40px;">No.</th>
             <th style="width: 80px;">Week</th>
@@ -118,6 +117,13 @@
 
         rows.forEach((row, rowIndex) => {
             const cell0 = row[0] ? String(row[0]).trim() : "";
+            const cell1 = row[1] ? String(row[1]).trim() : "";
+            
+            // ၁။ အကယ်၍ Row ထဲမှာ "No." သို့မဟုတ် "Week" ပါနေလျှင် (Header Row အပိုများဖြစ်၍) ကျော်သွားပါမည်။
+            if (cell0 === "No." || cell1 === "Week") {
+                return;
+            }
+
             const isNameRow = cell0 && !row[1] && !row[2];
 
             if (isNameRow) {
