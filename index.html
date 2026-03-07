@@ -121,7 +121,7 @@
             <th>စည်းကမ်းလိုက်နာမှု<br>(Disciplinarian)</th>
         </tr>`;
 
-        let currentNo = ""; // လက်ရှိ နံပါတ်စဉ်ကို မှတ်ထားရန်
+        let currentNo = ""; 
 
         rows.forEach((row, rowIndex) => {
             const cell0 = row[0] ? String(row[0]).trim() : "";
@@ -137,7 +137,7 @@
                 trName.innerHTML = `<td colspan="8">${cell0}</td>`;
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
-                currentNo = ""; // ဝန်ထမ်းအသစ်ရောက်တိုင်း No. ကို Reset လုပ်ရန်
+                currentNo = ""; 
             } else if (row[1] || cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း")) {
                 const tr = document.createElement('tr');
                 const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
@@ -145,31 +145,39 @@
                 if (isTotalRow) tr.className = 'total-row';
 
                 for (let i = 0; i < 8; i++) {
-                    // Column A (No.) ဖြစ်ပြီး ဒေတာ Row ဖြစ်ပါက Merge လုပ်ရန်
+                    // Column A (No.) အတွက် Merge Logic
                     if (i === 0 && !isTotalRow && row[1]) {
                         if (cell0 !== "" && cell0 !== currentNo) {
                             const td = document.createElement('td');
                             td.textContent = cell0;
-                            td.rowSpan = 8; // Row ၈ ခုကို Merge လုပ်ခြင်း (Week 1 to Remark 4)
+                            td.rowSpan = 8; 
                             td.style.fontWeight = "bold";
                             td.style.fontSize = "18px";
-                            td.style.verticalAlign = "middle"; // Center ကျစေရန်
+                            td.style.verticalAlign = "middle";
                             tr.appendChild(td);
                             currentNo = cell0;
                         }
-                        continue; // ကျန်တဲ့ Row အလွတ်တွေမှာ No. အကွက် ထပ်မဖန်တီးတော့ပါ
+                        continue; 
                     }
+
+                    // Row No. (12, 13, 14) စသည့် Total Row များအတွက် Column A နှင့် B ကို Merge လုပ်ခြင်း
+                    if (isTotalRow && i === 0) {
+                        const td = document.createElement('td');
+                        td.colSpan = 2; // Column A နှင့် B ကို ပေါင်းခြင်း
+                        td.textContent = cell0;
+                        td.style.fontWeight = "bold";
+                        td.style.textAlign = "center"; // စာသားကို Center ထားခြင်း
+                        td.style.verticalAlign = "middle";
+                        tr.appendChild(td);
+                        continue; 
+                    }
+                    
+                    // Column B ကို ကျော်သွားရန် (A နဲ့ Merge လုပ်ထားလို့)
+                    if (isTotalRow && i === 1) continue;
 
                     const td = document.createElement('td');
                     let val = row[i] || '';
-
-                    if (isTotalRow && cell0.includes("စုစုပေါင်း") && i === 0) {
-                        td.textContent = cell0;
-                        td.style.textAlign = "left";
-                        td.style.paddingLeft = "10px";
-                    } else {
-                        td.textContent = val;
-                    }
+                    td.textContent = val;
 
                     if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
                         td.className = 'editable';
@@ -182,7 +190,6 @@
             }
         });
     }
-
     async function updateSheet(r, c, v) {
         const status = document.getElementById('status-msg');
         status.style.display = 'block';
