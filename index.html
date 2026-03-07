@@ -119,12 +119,12 @@
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const cell1 = row[1] ? String(row[1]).trim() : "";
             
-            // ၁။ အကယ်၍ Row ထဲမှာ "No." သို့မဟုတ် "Week" ပါနေလျှင် (Header Row အပိုများဖြစ်၍) ကျော်သွားပါမည်။
-            if (cell0 === "No." || cell1 === "Week") {
+            // ၁။ Header Row အပိုများနှင့် "Total Average Bonus" စာသားသီးသန့် Row များကို ဖယ်ထုတ်ခြင်း
+            if (cell0 === "No." || cell1 === "Week" || cell0.includes("Total Average Bonus")) {
                 return;
             }
 
-            const isNameRow = cell0 && !row[1] && !row[2];
+            const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
 
             if (isNameRow) {
                 const trName = document.createElement('tr');
@@ -134,14 +134,24 @@
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
             } else if (row[1] || cell0.includes("Total") || cell0.includes("Average")) {
                 const tr = document.createElement('tr');
-                const isTotal = cell0.includes("Total") || cell0.includes("Average");
-                if (isTotal) tr.className = 'total-row';
+                const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
+                
+                if (isTotalRow) tr.className = 'total-row';
 
                 for (let i = 0; i < 8; i++) {
                     const td = document.createElement('td');
-                    const val = row[i] || '';
-                    td.textContent = val;
-                    if (i >= 2 && i <= 7 && !isTotal && row[1]) {
+                    let val = row[i] || '';
+
+                    // ၂။ "ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း" ကို Thingyan Moe ပုံစံအတိုင်း Row တစ်ခုတည်းဖြစ်အောင် ညှိခြင်း
+                    if (i === 0 && cell0.includes("ပျမ်းမျှ") && cell0.includes("စုစုပေါင်း")) {
+                        td.textContent = "ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း (Total Average Bonus)";
+                        td.style.fontWeight = "bold";
+                    } else {
+                        td.textContent = val;
+                    }
+
+                    // အမှတ်ပေးကွက်များကိုသာ Edit လုပ်ခွင့်ပေးခြင်း
+                    if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
                         td.className = 'editable';
                         td.contentEditable = true;
                         td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
