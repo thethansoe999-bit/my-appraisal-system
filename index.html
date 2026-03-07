@@ -111,8 +111,8 @@
         tableBody.innerHTML = '';
         
         const headerHTML = `<tr class="emp-header-row">
-            <th style="width: 40px;">No.</th>
-            <th style="width: 80px;">Week</th>
+            <th style="width: 50px;">No.</th>
+            <th style="width: 100px;">Week</th>
             <th>မှီခိုအားထားနိုင်ခြင်း နှင့် ယုံကြည်စိတ်ချရခြင်း<br>(Dependable and Reliable)</th>
             <th>ဝန်ဆောင်မှု ကောင်းမွန်ခြင်း<br>(Good Customer Service)</th>
             <th>တာဝန်ယူတတ်ခြင်း နှင့် စိတ်နေသဘောထား<br>(Accountable and Good Attitude)</th>
@@ -121,14 +121,13 @@
             <th>စည်းကမ်းလိုက်နာမှု<br>(Disciplinarian)</th>
         </tr>`;
 
+        let currentNo = ""; // လက်ရှိ နံပါတ်စဉ်ကို မှတ်ထားရန်
+
         rows.forEach((row, rowIndex) => {
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const cell1 = row[1] ? String(row[1]).trim() : "";
             
-            // ၁။ Header Row အပိုများကိုသာ ဖယ်ထုတ်ပါမည် (Total Average Bonus ကို မဖယ်တော့ပါ)
-            if (cell0 === "No." || cell1 === "Week") {
-                return;
-            }
+            if (cell0 === "No." || cell1 === "Week") return;
 
             const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
 
@@ -138,6 +137,7 @@
                 trName.innerHTML = `<td colspan="8">${cell0}</td>`;
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
+                currentNo = ""; // ဝန်ထမ်းအသစ်ရောက်တိုင်း No. ကို Reset လုပ်ရန်
             } else if (row[1] || cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း")) {
                 const tr = document.createElement('tr');
                 const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
@@ -145,19 +145,32 @@
                 if (isTotalRow) tr.className = 'total-row';
 
                 for (let i = 0; i < 8; i++) {
+                    // Column A (No.) ဖြစ်ပြီး ဒေတာ Row ဖြစ်ပါက Merge လုပ်ရန်
+                    if (i === 0 && !isTotalRow && row[1]) {
+                        if (cell0 !== "" && cell0 !== currentNo) {
+                            const td = document.createElement('td');
+                            td.textContent = cell0;
+                            td.rowSpan = 8; // Row ၈ ခုကို Merge လုပ်ခြင်း (Week 1 to Remark 4)
+                            td.style.fontWeight = "bold";
+                            td.style.fontSize = "18px";
+                            td.style.verticalAlign = "middle"; // Center ကျစေရန်
+                            tr.appendChild(td);
+                            currentNo = cell0;
+                        }
+                        continue; // ကျန်တဲ့ Row အလွတ်တွေမှာ No. အကွက် ထပ်မဖန်တီးတော့ပါ
+                    }
+
                     const td = document.createElement('td');
                     let val = row[i] || '';
 
-                    // ၂။ Total Average Bonus Row အတွက် ပုံစံညှိခြင်း (နမူနာပုံအတိုင်း)
                     if (isTotalRow && cell0.includes("စုစုပေါင်း") && i === 0) {
-                        td.textContent = cell0; // "ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း (Total Average Bonus)"
+                        td.textContent = cell0;
                         td.style.textAlign = "left";
                         td.style.paddingLeft = "10px";
                     } else {
                         td.textContent = val;
                     }
 
-                    // အမှတ်ပေးကွက်များကိုသာ Edit လုပ်ခွင့်ပေးခြင်း
                     if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
                         td.className = 'editable';
                         td.contentEditable = true;
