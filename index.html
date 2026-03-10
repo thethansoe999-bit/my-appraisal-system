@@ -7,64 +7,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --teal-dark: #00796b; --teal-main: #009688; --teal-light: #e0f2f1; --teal-header: #b2dfdb; }
-    body { font-family: 'Pyidaungsu', sans-serif; background-color: #f0f4f3; margin: 0; padding: 20px; }
-    
-    .container { 
-        max-width: 1550px; 
-        margin: auto; 
-        background: white; 
-        padding: 30px; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-    }
-    
-    .header-title { text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; }
-    
-    .filter-group { display: flex; gap: 15px; margin-bottom: 25px; justify-content: space-between; flex-wrap: nowrap; }
-    .filter-btn, .print-btn { flex: 1; padding: 12px 5px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Pyidaungsu', sans-serif; font-size: 15px; transition: all 0.3s ease; border: 2px solid #ddd; background: white; color: #333; text-align: center; }
+        body { font-family: 'Pyidaungsu', sans-serif; background-color: #f0f4f3; margin: 0; padding: 20px; }
+        
+        .container { 
+            max-width: 1550px; 
+            margin: auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        }
+        
+        .header-title { text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; }
+        
+        .filter-group { display: flex; gap: 15px; margin-bottom: 25px; justify-content: space-between; flex-wrap: nowrap; }
+        .filter-btn, .print-btn { flex: 1; padding: 12px 5px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Pyidaungsu', sans-serif; font-size: 15px; transition: all 0.3s ease; border: 2px solid #ddd; background: white; color: #333; text-align: center; }
 
-    .btn-all:hover { background-color: #2196F3 !important; color: white !important; border-color: #2196F3; }
-    .btn-reliable:hover { background-color: #4CAF50 !important; color: white !important; border-color: #4CAF50; }
-    .btn-unreliable:hover { background-color: #f44336 !important; color: white !important; border-color: #f44336; }
-    .print-btn:hover { background-color: #795548 !important; color: white !important; border-color: #795548; }
+        .btn-all:hover { background-color: #2196F3 !important; color: white !important; border-color: #2196F3; }
+        .btn-reliable:hover { background-color: #4CAF50 !important; color: white !important; border-color: #4CAF50; }
+        .btn-unreliable:hover { background-color: #f44336 !important; color: white !important; border-color: #f44336; }
+        .print-btn:hover { background-color: #795548 !important; color: white !important; border-color: #795548; }
 
-    .filter-btn.active { background-color: var(--teal-main); color: white; border-color: var(--teal-main); }
-    .print-btn { background: #43a047; color: white; border: none; }
+        .filter-btn.active { background-color: var(--teal-main); color: white; border-color: var(--teal-main); }
+        .print-btn { background: #43a047; color: white; border: none; }
 
-    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; } 
-    
-    .emp-name-row td { background-color: var(--teal-light); color: var(--teal-dark); font-size: 24px; font-weight: bold; padding: 15px; border: 2px solid var(--teal-main); text-align: center; }
-    
-    /* Column အကျယ်များကို လူကြီးမင်း အလိုရှိသည့်အတိုင်း တိကျစွာ ချိန်ညှိခြင်း */
-    .emp-header-row th:nth-child(1) { width: 30px; }  /* Column A: No. (30px သို့ လျှော့ချခြင်း) */
-    .emp-header-row th:nth-child(2) { width: 80px; }  /* Column B: Week */
-    
-    /* Column C မှ H အထိ (အမှတ်ပေးကွက်များ) ကို ညီညာစွာ အချိုးကျ ချဲ့ပေးခြင်း */
-    .emp-header-row th:nth-child(n+3) { width: auto; } 
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; } 
+        
+        .emp-name-row td { background-color: var(--teal-light); color: var(--teal-dark); font-size: 24px; font-weight: bold; padding: 15px; border: 2px solid var(--teal-main); text-align: center; }
+        
+        .emp-header-row th:nth-child(1) { width: 30px; }  
+        .emp-header-row th:nth-child(2) { width: 80px; }  
+        .emp-header-row th:nth-child(n+3) { width: auto; } 
 
-    .emp-header-row th { 
-        background-color: var(--teal-header); 
-        color: var(--teal-dark); 
-        padding: 8px 4px; 
-        font-size: 12px; 
-        border: 1px solid #90a4ae; 
-        height: 110px; 
-        vertical-align: middle;
-        line-height: 1.4;
-        word-wrap: break-word;
-    }
-    
-    td { border: 1px solid #cfd8dc; text-align: center; vertical-align: middle; height: 45px; font-size: 14px; overflow: hidden; }
-    .total-row td { background-color: #f9f9f9; font-weight: bold; }
-    .editable:hover { background-color: #fff9c4 !important; outline: 2px solid var(--teal-main); cursor: cell; }
-    #status-msg { text-align: center; padding: 10px; font-weight: bold; color: var(--teal-dark); font-size: 18px; }
+        .emp-header-row th { 
+            background-color: var(--teal-header); 
+            color: var(--teal-dark); 
+            padding: 8px 4px; 
+            font-size: 12px; 
+            border: 1px solid #90a4ae; 
+            height: 110px; 
+            vertical-align: middle;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        td { border: 1px solid #cfd8dc; text-align: center; vertical-align: middle; height: 45px; font-size: 14px; overflow: hidden; }
+        .total-row td { background-color: #f9f9f9; font-weight: bold; }
+        .editable:hover { background-color: #fff9c4 !important; outline: 2px solid var(--teal-main); cursor: cell; }
+        #status-msg { text-align: center; padding: 10px; font-weight: bold; color: var(--teal-dark); font-size: 18px; }
 
-    @media print {
-        @page { size: A3 landscape; margin: 0.5cm; }
-        body { padding: 0; background: white; }
-        .container { box-shadow: none; max-width: 100%; padding: 0; }
-        .filter-group { display: none; }
-    }
+        @media print {
+            @page { size: A3 landscape; margin: 0.5cm; }
+            body { padding: 0; background: white; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; }
+            .filter-group { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -72,9 +69,9 @@
 <div class="container">
     <div class="header-title">Appraisal Form For Trustworthy Bonus</div>
     <div class="filter-group">
-        <button class="filter-btn active btn-all" onclick="filterData('all', this)">All Employees</button>
-        <button class="filter-btn btn-reliable" onclick="filterData('5', this)">Reliable Employees</button>
-        <button class="filter-btn btn-unreliable" onclick="filterData('low', this)">Unreliable Employees</button>
+        <button id="btn-all" class="filter-btn active btn-all" onclick="filterData('all', this)">All Employees</button>
+        <button id="btn-reliable" class="filter-btn btn-reliable" onclick="filterData('5', this)">Reliable Employees</button>
+        <button id="btn-unreliable" class="filter-btn btn-unreliable" onclick="filterData('low', this)">Unreliable Employees</button>
         <button class="print-btn" onclick="window.print()">Print Report</button>
     </div>
     <div id="status-msg">ဒေတာများကို ချိတ်ဆက်နေပါသည်...</div>
@@ -89,44 +86,35 @@
     const SHEET_NAME = 'Jan'; 
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzXLqm4_MT9iQi4fezcJ-Pd0dih2vBNemfWoyX0bKbgRGSRFy7NhXe2e7xLtUNcnuve/exec";
 
+    // Global variable to store original data
+    window.allDataRows = [];
+
     async function fetchData() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A2:H500?key=${API_KEY}`;
         try {
             const response = await fetch(url);
             const data = await response.json();
             if (data.values) {
+                window.allDataRows = data.values; // Store in window object to ensure persistence
                 document.getElementById('status-msg').style.display = 'none';
                 document.getElementById('appraisalTable').style.display = 'table';
-                renderTable(data.values);
+                renderTable(window.allDataRows);
             }
         } catch (error) {
-            document.getElementById('status-msg').textContent = 'ဒေတာချိတ်ဆက်မှု မအောင်မြင်ပါ။ (Internet သို့မဟုတ် API Key စစ်ဆေးပါ)';
+            document.getElementById('status-msg').textContent = 'ဒေတာချိတ်ဆက်မှု မအောင်မြင်ပါ။';
         }
     }
 
-   function renderTable(rows) {
+    function renderTable(rows) {
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
-        
-        const headerHTML = `<tr class="emp-header-row">
-            <th style="width: 30px;">No.</th>
-            <th style="width: 80px;">Week</th>
-            <th>မှီခိုအားထားနိုင်ခြင်း နှင့် ယုံကြည်စိတ်ချရခြင်း<br>(Dependable and Reliable)</th>
-            <th>ဝန်ဆောင်မှု ကောင်းမွန်ခြင်း<br>(Good Customer Service)</th>
-            <th>တာဝန်ယူတတ်ခြင်း နှင့် စိတ်နေသဘောထား<br>(Accountable and Good Attitude)</th>
-            <th>လူအများနှင့် လိုက်လျောညီထွေ ပြောဆိုနေထိုင်တတ်မှု<br>(Good Communication)</th>
-            <th>သပ်ရပ်သန့်ရှင်းစွာ နေထိုင်တတ်ခြင်း<br>(Personal Grooming)</th>
-            <th>စည်းကမ်းလိုက်နာမှု<br>(Disciplinarian)</th>
-        </tr>`;
-
+        const headerHTML = `<tr class="emp-header-row"><th>No.</th><th>Week</th><th>မှီခိုအားထားနိုင်ခြင်း နှင့် ယုံကြည်စိတ်ချရခြင်း<br>(Dependable and Reliable)</th><th>ဝန်ဆောင်မှု ကောင်းမွန်ခြင်း<br>(Good Customer Service)</th><th>တာဝန်ယူတတ်ခြင်း နှင့် စိတ်နေသဘောထား<br>(Accountable and Good Attitude)</th><th>လူအများနှင့် လိုက်လျောညီထွေ ပြောဆိုနေထိုင်တတ်မှု<br>(Good Communication)</th><th>သပ်ရပ်သန့်ရှင်းစွာ နေထိုင်တတ်ခြင်း<br>(Personal Grooming)</th><th>စည်းကမ်းလိုက်နာမှု<br>(Disciplinarian)</th></tr>`;
         let currentNo = ""; 
 
         rows.forEach((row, rowIndex) => {
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const cell1 = row[1] ? String(row[1]).trim() : "";
-            
             if (cell0 === "No." || cell1 === "Week") return;
-
             const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
 
             if (isNameRow) {
@@ -146,119 +134,60 @@
                 const tr = document.createElement('tr');
                 const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
                 const isFinalBonusRow = cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း");
-
                 if (isTotalRow) tr.className = 'total-row';
 
                 for (let i = 0; i < 8; i++) {
-                    // Column A & B Merge (Label)
                     if (isTotalRow && i === 0) {
                         const td = document.createElement('td');
-                        td.colSpan = 2; 
-                        td.textContent = cell0;
-                        td.style.fontWeight = "bold";
-                        td.style.textAlign = "center";
-                        tr.appendChild(td);
-                        continue; 
+                        td.colSpan = 2; td.textContent = cell0; td.style.fontWeight = "bold"; td.style.textAlign = "center";
+                        tr.appendChild(td); continue; 
                     }
                     if (isTotalRow && i === 1) continue;
 
-                    // Final Bonus Row Special Logic
                     if (isFinalBonusRow) {
-                        // Column C, D, E Merge (Formula Amount - Non Editable)
                         if (i === 2) {
-                            const tdAmt = document.createElement('td');
-                            tdAmt.colSpan = 3;
-                            const val = parseFloat(row[2]) || 0;
-                            tdAmt.textContent = val;
-                            tdAmt.style.fontWeight = "bold";
-                            tdAmt.style.textAlign = "center";
-                            // အရောင်သတ်မှတ်ခြင်း
-                            if (val <= 30000) tdAmt.style.color = "red";
-                            else if (val <= 60000) tdAmt.style.color = "black";
-                            else tdAmt.style.color = "#2e7d32";
-                            tr.appendChild(tdAmt);
-                            continue;
+                            const tdAmt = document.createElement('td'); tdAmt.colSpan = 3;
+                            const val = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
+                            tdAmt.textContent = row[2] || '0'; tdAmt.style.fontWeight = "bold"; tdAmt.style.textAlign = "center";
+                            if (val <= 30000) tdAmt.style.color = "red"; else if (val <= 60000) tdAmt.style.color = "black"; else tdAmt.style.color = "#2e7d32";
+                            tr.appendChild(tdAmt); continue;
                         }
                         if (i === 3 || i === 4) continue;
-
-                        // Column F (အမှန်တကယ်ရရှိမည့် ဆုကြေးငွေ စာသား - အရင်က G,H မှာရှိတာကို Column F တစ်ခုတည်းမှာပြမယ်)
                         if (i === 5) {
-                            const tdTxt = document.createElement('td');
-                            tdTxt.textContent = "အမှန်တကယ်ရရှိမည့် ဆုကြေးငွေ (Actual Bonus)";
-                            tdTxt.style.fontSize = "12px";
-                            tdTxt.style.fontWeight = "bold";
-                            tr.appendChild(tdTxt);
-                            continue;
+                            const tdTxt = document.createElement('td'); tdTxt.textContent = "အမှန်တကယ်ရရှိမည့် ဆုကြေးငွေ (Actual Bonus)"; tdTxt.style.fontSize = "12px"; tdTxt.style.fontWeight = "bold";
+                            tr.appendChild(tdTxt); continue;
                         }
-
-                        // Column G, H Merge (Manual Input Amount - Editable)
                         if (i === 6) {
-                            const tdManual = document.createElement('td');
-                            tdManual.colSpan = 2;
-                            const mVal = parseFloat(row[6]) || 0;
-                            tdManual.textContent = row[6] || '';
-                            tdManual.contentEditable = true;
-                            tdManual.className = 'editable';
-                            tdManual.style.fontWeight = "bold";
-                            tdManual.style.textAlign = "center";
-                            
-                            // အရောင်သတ်မှတ်ခြင်း
-                            if (mVal <= 30000) tdManual.style.color = "red";
-                            else if (mVal <= 60000) tdManual.style.color = "black";
-                            else tdManual.style.color = "#2e7d32";
-
+                            const tdManual = document.createElement('td'); tdManual.colSpan = 2;
+                            const mVal = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
+                            tdManual.textContent = row[6] || ''; tdManual.contentEditable = true; tdManual.className = 'editable'; tdManual.style.fontWeight = "bold"; tdManual.style.textAlign = "center";
+                            if (mVal <= 30000) tdManual.style.color = "red"; else if (mVal <= 60000) tdManual.style.color = "black"; else tdManual.style.color = "#2e7d32";
                             tdManual.onblur = () => updateSheet(rowIndex + 2, 7, tdManual.textContent.trim());
                             tdManual.onkeydown = (e) => { if(e.key === "Enter") { e.preventDefault(); tdManual.blur(); } };
-                            
-                            tr.appendChild(tdManual);
-                            continue;
+                            tr.appendChild(tdManual); continue;
                         }
                         if (i === 7) continue;
                     }
 
-                    // Standard Weekly Rows No. Column
                     if (i === 0 && !isTotalRow && row[1]) {
                         if (cell0 !== "" && cell0 !== currentNo) {
-                            const td = document.createElement('td');
-                            td.textContent = cell0;
-                            td.rowSpan = 8; 
-                            td.style.fontWeight = "bold";
-                            td.style.fontSize = "18px";
-                            td.style.verticalAlign = "middle";
-                            tr.appendChild(td);
-                            currentNo = cell0;
+                            const td = document.createElement('td'); td.textContent = cell0; td.rowSpan = 8; td.style.fontWeight = "bold"; td.style.fontSize = "18px"; td.style.verticalAlign = "middle";
+                            tr.appendChild(td); currentNo = cell0;
                         }
                         continue; 
                     }
 
-                    // All other standard cells
                     const td = document.createElement('td');
-                    let val = row[i] || '';
-                    td.textContent = val;
+                    let val = row[i] || ''; td.textContent = val;
 
                     if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
-                        td.className = 'editable';
-                        td.contentEditable = true;
+                        td.className = 'editable'; td.contentEditable = true;
                         const s = parseInt(val);
                         if (!isNaN(s)) {
                             if (s <= 2) { td.style.color = "red"; td.style.fontWeight = "bold"; }
                             else if (s === 5) { td.style.color = "#2e7d32"; td.style.fontWeight = "bold"; }
                         }
-                        td.onkeydown = (e) => {
-                            if (e.key === "Enter") {
-                                e.preventDefault();
-                                td.blur();
-                                let next = td.nextElementSibling;
-                                if (next && next.contentEditable === "true") next.focus();
-                                else {
-                                    let nextR = tr.nextElementSibling;
-                                    if (nextR) {
-                                        let first = nextR.querySelector('[contenteditable="true"]');
-                                        if (first) first.focus();
-                                    }
-                                }
-                            }
-                        };
+                        td.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); td.blur(); let next = td.nextElementSibling; if (next && next.contentEditable === "true") next.focus(); else { let nextR = tr.nextElementSibling; if (nextR) { let first = nextR.querySelector('[contenteditable="true"]'); if (first) first.focus(); } } } };
                         td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
                     }
                     tr.appendChild(td);
@@ -267,44 +196,28 @@
             }
         });
     }
+
     async function updateSheet(r, c, v) {
         const status = document.getElementById('status-msg');
-        status.style.display = 'block';
-        status.textContent = 'ဒေတာများကို သိမ်းဆည်းပြီး ပြန်လည်တွက်ချက်နေပါသည်...';
-        
+        status.style.display = 'block'; status.textContent = 'သိမ်းဆည်းနေပါသည်...';
         try {
-            // ၁။ Google Sheet ဆီသို့ အမှတ်အသစ်ကို ပို့လွှတ်ခြင်း
             const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
-            
             if (response.ok) {
-                status.textContent = 'သိမ်းဆည်းမှု အောင်မြင်ပြီး ဒေတာများ Sync ဖြစ်သွားပါပြီ။';
-                
-                // ၂။ Formula တွက်ချက်ပြီးသား အဖြေအသစ်များကို Google Sheet မှ ပြန်လည်ရယူခြင်း (Real-time Sync)
-                setTimeout(async () => {
-                    await fetchData(); // ဒေတာအသစ်များကို ပြန်ဆွဲထုတ်ပြီး ဇယားကို Update လုပ်ခြင်း
-                    status.style.display = 'none';
-                }, 1000); // Sheet ဘက်က Formula တွက်ချိန် ၁ စက္ကန့်ပေးခြင်း
+                status.textContent = 'Sync အောင်မြင်ပါသည်။';
+                setTimeout(async () => { await fetchData(); status.style.display = 'none'; }, 1000); 
             }
-        } catch (e) {
-            status.textContent = 'Error: ဒေတာသိမ်းဆည်းမှု မအောင်မြင်ပါ။';
-            console.error(e);
-        }
+        } catch (e) { status.textContent = 'Error ဖြစ်သွားပါသည်။'; }
     }
 
     function filterData(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        if (type === 'all') { renderTable(window.allDataRows); return; }
 
-        if (type === 'all') {
-            renderTable(allRows);
-            return;
-        }
-
-        // ၁။ ဝန်ထမ်းတစ်ယောက်ချင်းစီရဲ့ အချက်အလက်တွေကို အုပ်စုဖွဲ့ခြင်း
         let employees = [];
         let currentEmp = null;
 
-        allRows.forEach((row) => {
+        window.allDataRows.forEach((row) => {
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
 
@@ -313,38 +226,28 @@
                 currentEmp = { rows: [row], hasRed: false, hasGreen: false };
             } else if (currentEmp) {
                 currentEmp.rows.push(row);
-
-                // အမှတ်များကို စစ်ဆေးခြင်း
                 if (row[1] && String(row[1]).includes("Week")) {
                     for (let j = 2; j <= 7; j++) {
-                        const score = parseInt(row[j]);
-                        if (!isNaN(score)) {
-                            if (score <= 2) currentEmp.hasRed = true;
-                            if (score === 5) currentEmp.hasGreen = true;
-                        }
+                        const s = parseInt(row[j]);
+                        if (!isNaN(s)) { if (s <= 2) currentEmp.hasRed = true; if (s === 5) currentEmp.hasGreen = true; }
                     }
                 }
-
-                // ငွေသားများကို စစ်ဆေးခြင်း
                 if (cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း")) {
-                    const bonusVal = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
-                    const manualVal = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
-                    
-                    if ((bonusVal > 0 && bonusVal <= 30000) || (manualVal > 0 && manualVal <= 30000)) currentEmp.hasRed = true;
-                    if (bonusVal > 60000 || manualVal > 60000) currentEmp.hasGreen = true;
+                    const bv = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
+                    const mv = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
+                    if ((bv > 0 && bv <= 30000) || (mv > 0 && mv <= 30000)) currentEmp.hasRed = true;
+                    if (bv > 60000 || mv > 60000) currentEmp.hasGreen = true;
                 }
             }
         });
         if (currentEmp) employees.push(currentEmp);
 
-        // ၂။ စစ်ဆေးပြီး အုပ်စုတွေကို Filter လုပ်ခြင်း
-        let filteredRows = [];
-        employees.forEach(emp => {
-            if (type === 'low' && emp.hasRed) filteredRows.push(...emp.rows);
-            if (type === '5' && emp.hasGreen) filteredRows.push(...emp.rows);
+        let result = [];
+        employees.forEach(e => {
+            if (type === 'low' && e.hasRed) result.push(...e.rows);
+            if (type === '5' && e.hasGreen) result.push(...e.rows);
         });
-
-        renderTable(filteredRows);
+        renderTable(result);
     }
     fetchData();
 </script>
