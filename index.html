@@ -132,13 +132,12 @@
             if (isNameRow) {
                 const trName = document.createElement('tr');
                 trName.className = 'emp-name-row';
-                // အမည်ကို Edit လုပ်လို့ရအောင် ပြင်ဆင်ခြင်း
                 const tdName = document.createElement('td');
                 tdName.colSpan = 8;
                 tdName.textContent = cell0;
                 tdName.contentEditable = true;
-                tdName.className = 'editable'; // Hover effect ရစေရန်
-                tdName.onblur = () => updateSheet(rowIndex + 2, 1, tdName.textContent.trim()); // Column 1 (A) ကို Update လုပ်ရန်
+                tdName.className = 'editable';
+                tdName.onblur = () => updateSheet(rowIndex + 2, 1, tdName.textContent.trim());
                 
                 trName.appendChild(tdName);
                 tableBody.appendChild(trName);
@@ -182,11 +181,29 @@
                     let val = row[i] || '';
                     td.textContent = val;
 
+                    // --- အဆင့် (၁၂) အရောင်ခွဲခြားခြင်း Logic ---
                     if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
                         td.className = 'editable';
                         td.contentEditable = true;
+                        
+                        // အမှတ်အလိုက် အရောင်သတ်မှတ်ခြင်း
+                        const score = parseInt(val);
+                        if (!isNaN(score)) {
+                            if (score <= 2) {
+                                td.style.color = "red";
+                                td.style.fontWeight = "bold";
+                            } else if (score === 3 || score === 4) {
+                                td.style.color = "black";
+                            } else if (score === 5) {
+                                td.style.color = "#2e7d32"; // အစိမ်းရင့်ရောင်
+                                td.style.fontWeight = "bold";
+                            }
+                        }
+
                         td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
                     }
+                    // ---------------------------------------
+
                     tr.appendChild(td);
                 }
                 tableBody.appendChild(tr);
