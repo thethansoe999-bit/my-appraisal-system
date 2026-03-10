@@ -55,7 +55,7 @@
 
     window.allDataRows = [];
 
-    // လူကြီးမင်း သတ်မှတ်ပေးထားသော Remark Rows များစာရင်း (Google Sheet Row Numbers)
+    // လူကြီးမင်း သတ်မှတ်ပေးထားသော Remark Rows များစာရင်း (ဤ Row နံပါတ်များထဲပါမှ Remark ဖြည့်ပါမည်)
     const validRemarkRows = [5,7,9,11,19,21,23,25,33,35,37,39,47,49,51,53,61,63,65,67,75,77,79,81,89,91,93,95,103,105,107,109,117,119,121,123,131,133,135,137,145,147,149,151,159,161,163,165,173,175,177,179];
 
     async function fetchData() {
@@ -81,7 +81,7 @@
         let currentNo = ""; 
 
         rows.forEach((row, rowIndex) => {
-            const sheetRowNum = rowIndex + 2; // Google Sheet ရဲ့ Row Number
+            const sheetRowNum = rowIndex + 2; 
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const cell1 = row[1] ? String(row[1]).trim() : "";
             if (cell0 === "No." || cell1 === "Week") return;
@@ -221,15 +221,15 @@
             const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
             
             if (response.ok) {
-                // Column C (index 3) မှာ အမှတ်ထည့်ရင် Remark Row ကို စစ်ဆေးပြီးမှ Update လုပ်မယ်
-                if (parseInt(c) === 3) {
-                    const nextRow = parseInt(r) + 1;
-                    // အကယ်၍ နောက်တစ်ကြောင်းက လူကြီးမင်း သတ်မှတ်ထားတဲ့ validRemarkRows ထဲမှာ ပါမှသာ Remark ထည့်မယ်
-                    if (validRemarkRows.includes(nextRow)) {
-                        const remarkText = generateRemark(parseInt(v));
-                        await fetch(`${WEB_APP_URL}?row=${nextRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
-                    }
+                // အမှတ်ထည့်လိုက်သည့် Row ၏ နောက်တစ်ကြောင်း (Remark Row) ကို တွက်ချက်သည်
+                const nextRow = parseInt(r) + 1;
+
+                // Column C ဖြစ်ရမည်ဖြစ်ပြီး၊ နောက်တစ်ကြောင်းသည် validRemarkRows စာရင်းထဲတွင် ပါမှသာ Remark ဖြည့်မည်
+                if (parseInt(c) === 3 && validRemarkRows.includes(nextRow)) {
+                    const remarkText = generateRemark(parseInt(v));
+                    await fetch(`${WEB_APP_URL}?row=${nextRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
                 }
+                
                 status.textContent = 'သိမ်းဆည်းမှု အောင်မြင်ပါသည်။';
                 await fetchData(); 
                 status.style.display = 'none'; 
