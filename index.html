@@ -84,7 +84,7 @@
     const SPREADSHEET_ID = '1CKh9lQ7Z3hV65IeSNyn3IhsUXFrxO4XfC8bbTsJ084A';
     const API_KEY = 'AIzaSyDXEoPAFqagxCdOBJgnRaEPAf-fIEPgnIY';
     const SHEET_NAME = 'Jan'; 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzXLqm4_MT9iQi4fezcJ-Pd0dih2vBNemfWoyX0bKbgRGSRFy7NhXe2e7xLtUNcnuve/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwyuMsm7S5zerJEqYXwb7rDWFe88rRgHJF7SkoTiRrEwZdKejyNg-F48TTuOTaQcEpH/exec";
 
     // Global variable to store original data
     window.allDataRows = [];
@@ -228,22 +228,35 @@
 
     async function updateSheet(r, c, v) {
         const status = document.getElementById('status-msg');
-        status.style.display = 'block'; status.textContent = 'သိမ်းဆည်းနေပါသည်...';
+        status.style.display = 'block'; 
+        status.textContent = 'သိမ်းဆည်းနေပါသည်...';
+        
         try {
+            // ၁။ အမှတ်ကို အရင်ပို့ခြင်း
             const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
+            
             if (response.ok) {
-                // Column C (index 3) ဖြစ်လျှင် Remark Row ကိုပါ Update လုပ်ခြင်း
-                if (c === 3) {
-                    const remarkRow = r + 1;
+                // ၂။ Column C ဖြစ်လျှင် Remark ကိုပါ ချက်ချင်းပို့ခြင်း
+                if (parseInt(c) === 3) {
+                    const remarkRow = parseInt(r) + 1; // Remark Row က အမှတ် Row ရဲ့ အောက်တစ်ကြောင်းမှာ ရှိရမည်
                     const remarkText = generateRemark(parseInt(v));
+                    
+                    // Remark ကို သိမ်းရန် ဒုတိယအကြိမ် Fetch လုပ်ခြင်း
                     await fetch(`${WEB_APP_URL}?row=${remarkRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
                 }
-                status.textContent = 'Sync အောင်မြင်ပါသည်။';
-                setTimeout(async () => { await fetchData(); status.style.display = 'none'; }, 1000); 
+                
+                status.textContent = 'Sync အောင်မြင်ပြီး မှတ်ချက်များ ထည့်သွင်းပြီးပါပြီ။';
+                
+                // ဒေတာအသစ်ကို ပြန်ဆွဲရန် ခေတ္တစောင့်ခြင်း
+                setTimeout(async () => { 
+                    await fetchData(); 
+                    status.style.display = 'none'; 
+                }, 1500); 
             }
-        } catch (e) { status.textContent = 'Error ဖြစ်သွားပါသည်။'; }
+        } catch (e) { 
+            status.textContent = 'Error: ချိတ်ဆက်မှု လွဲမှားနေပါသည်။'; 
+        }
     }
-
     function filterData(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
