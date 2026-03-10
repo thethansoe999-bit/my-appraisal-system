@@ -302,50 +302,59 @@
 
         const filteredData = [];
         let currentBlock = [];
-        let hasRed = false;   // အနီရောင် (Unreliable) ရှိမရှိ
-        let hasGreen = false; // အစိမ်းရောင် (Reliable) ရှိမရှိ
+        let hasRed = false;   
+        let hasGreen = false; 
 
-        allRows.forEach((row) => {
+        // ဒေတာတွေကို စစ်ဆေးတဲ့အခါ နောက်ဆုံးဝန်ထမ်းအထိ ပါဝင်စေဖို့ loop ပတ်ပုံကို ပြင်ထားပါတယ်
+        for (let i = 0; i < allRows.length; i++) {
+            const row = allRows[i];
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
 
-            if (isNameRow) {
-                // အရင်ဝန်ထမ်း Block ကို Filter Type အလိုက် စစ်ဆေးပြီး သိမ်းမည်
-                if (type === 'low' && hasRed) filteredData.push(...currentBlock);
-                if (type === '5' && hasGreen) filteredData.push(...currentBlock);
+            // အကယ်၍ နာမည် Row အသစ်ဖြစ်နေရင် သို့မဟုတ် နောက်ဆုံး Row ဖြစ်နေရင်
+            if (isNameRow || i === allRows.length - 1) {
+                // အရင်ရှိနေတဲ့ Block ကို သိမ်းသင့်မသိမ်းသင့် အရင်စစ်မယ်
+                if (currentBlock.length > 0) {
+                    if (i === allRows.length - 1 && !isNameRow) currentBlock.push(row); // နောက်ဆုံးစာကြောင်း ထည့်ရန်
 
-                currentBlock = [row]; // ဝန်ထမ်းအသစ်စမည်
+                    if (type === 'low' && hasRed) filteredData.push(...currentBlock);
+                    if (type === '5' && hasGreen) filteredData.push(...currentBlock);
+                }
+                
+                // Block အသစ်ပြန်စမယ်
+                currentBlock = [row];
                 hasRed = false;
                 hasGreen = false;
+                
+                // အကယ်၍ ဒါက နောက်ဆုံး Row ဖြစ်ပြီး နာမည် Row လည်းဖြစ်နေရင်
+                if (i === allRows.length - 1 && isNameRow) {
+                     // ဒီလူအတွက် ဒေတာမရှိသေးလို့ ဘာမှမလုပ်တော့ပါ
+                }
             } else {
                 currentBlock.push(row);
                 
-                // Weekly Scores (အမှတ်များ) ကို စစ်ဆေးခြင်း
-                if (row[1] && row[1].includes("Week")) {
-                    for (let i = 2; i <= 7; i++) {
-                        const val = parseInt(row[i]);
-                        if (!isNaN(val)) {
-                            if (val <= 2) hasRed = true;
-                            if (val === 5) hasGreen = true;
+                // အမှတ်များကို စစ်ဆေးခြင်း
+                if (row[1] && String(row[1]).includes("Week")) {
+                    for (let j = 2; j <= 7; j++) {
+                        const score = parseInt(row[j]);
+                        if (!isNaN(score)) {
+                            if (score <= 2) hasRed = true;
+                            if (score === 5) hasGreen = true;
                         }
                     }
                 }
 
-                // Currency Amount (ဆုကြေးငွေ) ကို စစ်ဆေးခြင်း
+                // ဆုကြေးငွေများကို စစ်ဆေးခြင်း
                 if (cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း")) {
-                    const bonusVal = parseFloat(row[2]) || 0;
-                    const manualVal = parseFloat(row[6]) || 0;
-                    // Formula Amount သို့မဟုတ် Manual Amount တစ်ခုခုက အနီရောင် (30000 အောက်) ဖြစ်နေလျှင်
-                    if (bonusVal <= 30000 || manualVal <= 30000) hasRed = true;
-                    // တစ်ခုခုက အစိမ်းရောင် (60000 အထက်) ဖြစ်နေလျှင်
+                    // ကော်မာတွေကို ဖယ်ပြီး Number အဖြစ်ပြောင်းခြင်း
+                    const bonusVal = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
+                    const manualVal = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
+                    
+                    if ((bonusVal > 0 && bonusVal <= 30000) || (manualVal > 0 && manualVal <= 30000)) hasRed = true;
                     if (bonusVal > 60000 || manualVal > 60000) hasGreen = true;
                 }
             }
-        });
-
-        // နောက်ဆုံးဝန်ထမ်းအတွက် စစ်ဆေးသိမ်းဆည်းခြင်း
-        if (type === 'low' && hasRed) filteredData.push(...currentBlock);
-        if (type === '5' && hasGreen) filteredData.push(...currentBlock);
+        }
 
         renderTable(filteredData);
     }
