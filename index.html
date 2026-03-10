@@ -8,60 +8,27 @@
     <style>
         :root { --teal-dark: #00796b; --teal-main: #009688; --teal-light: #e0f2f1; --teal-header: #b2dfdb; }
         body { font-family: 'Pyidaungsu', sans-serif; background-color: #f0f4f3; margin: 0; padding: 20px; }
-        
-        .container { 
-            max-width: 1550px; 
-            margin: auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-        }
-        
+        .container { max-width: 1550px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .header-title { text-align: center; color: var(--teal-dark); font-size: 36px; font-weight: bold; margin-bottom: 25px; border-bottom: 3px solid var(--teal-header); padding-bottom: 15px; }
-        
         .filter-group { display: flex; gap: 15px; margin-bottom: 25px; justify-content: space-between; flex-wrap: nowrap; }
         .filter-btn, .print-btn { flex: 1; padding: 12px 5px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Pyidaungsu', sans-serif; font-size: 15px; transition: all 0.3s ease; border: 2px solid #ddd; background: white; color: #333; text-align: center; }
-
         .btn-all:hover { background-color: #2196F3 !important; color: white !important; border-color: #2196F3; }
         .btn-reliable:hover { background-color: #4CAF50 !important; color: white !important; border-color: #4CAF50; }
         .btn-unreliable:hover { background-color: #f44336 !important; color: white !important; border-color: #f44336; }
         .print-btn:hover { background-color: #795548 !important; color: white !important; border-color: #795548; }
-
         .filter-btn.active { background-color: var(--teal-main); color: white; border-color: var(--teal-main); }
         .print-btn { background: #43a047; color: white; border: none; }
-
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; } 
-        
         .emp-name-row td { background-color: var(--teal-light); color: var(--teal-dark); font-size: 24px; font-weight: bold; padding: 15px; border: 2px solid var(--teal-main); text-align: center; }
-        
         .emp-header-row th:nth-child(1) { width: 30px; }  
         .emp-header-row th:nth-child(2) { width: 80px; }  
         .emp-header-row th:nth-child(n+3) { width: auto; } 
-
-        .emp-header-row th { 
-            background-color: var(--teal-header); 
-            color: var(--teal-dark); 
-            padding: 8px 4px; 
-            font-size: 12px; 
-            border: 1px solid #90a4ae; 
-            height: 110px; 
-            vertical-align: middle;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-        
+        .emp-header-row th { background-color: var(--teal-header); color: var(--teal-dark); padding: 8px 4px; font-size: 12px; border: 1px solid #90a4ae; height: 110px; vertical-align: middle; line-height: 1.4; word-wrap: break-word; }
         td { border: 1px solid #cfd8dc; text-align: center; vertical-align: middle; height: 45px; font-size: 14px; overflow: hidden; }
         .total-row td { background-color: #f9f9f9; font-weight: bold; }
         .editable:hover { background-color: #fff9c4 !important; outline: 2px solid var(--teal-main); cursor: cell; }
         #status-msg { text-align: center; padding: 10px; font-weight: bold; color: var(--teal-dark); font-size: 18px; }
-
-        @media print {
-            @page { size: A3 landscape; margin: 0.5cm; }
-            body { padding: 0; background: white; }
-            .container { box-shadow: none; max-width: 100%; padding: 0; }
-            .filter-group { display: none; }
-        }
+        @media print { @page { size: A3 landscape; margin: 0.5cm; } body { padding: 0; background: white; } .container { box-shadow: none; max-width: 100%; padding: 0; } .filter-group { display: none; } }
     </style>
 </head>
 <body>
@@ -88,6 +55,9 @@
 
     window.allDataRows = [];
 
+    // လူကြီးမင်း သတ်မှတ်ပေးထားသော Remark Rows များစာရင်း (Google Sheet Row Numbers)
+    const validRemarkRows = [5,7,9,11,19,21,23,25,33,35,37,39,47,49,51,53,61,63,65,67,75,77,79,81,89,91,93,95,103,105,107,109,117,119,121,123,131,133,135,137,145,147,149,151,159,161,163,165,173,175,177,179];
+
     async function fetchData() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A2:H500?key=${API_KEY}`;
         try {
@@ -111,6 +81,7 @@
         let currentNo = ""; 
 
         rows.forEach((row, rowIndex) => {
+            const sheetRowNum = rowIndex + 2; // Google Sheet ရဲ့ Row Number
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const cell1 = row[1] ? String(row[1]).trim() : "";
             if (cell0 === "No." || cell1 === "Week") return;
@@ -124,7 +95,7 @@
                 tdName.textContent = cell0;
                 tdName.contentEditable = true;
                 tdName.className = 'editable';
-                tdName.onblur = () => updateSheet(rowIndex + 2, 1, tdName.textContent.trim());
+                tdName.onblur = () => updateSheet(sheetRowNum, 1, tdName.textContent.trim());
                 trName.appendChild(tdName);
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
@@ -133,9 +104,7 @@
                 const tr = document.createElement('tr');
                 const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
                 const isFinalBonusRow = cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း");
-                
-                // Remark Row ဟုတ်မဟုတ် စစ်ဆေးခြင်း
-                const isRemarkRow = !isNameRow && !isTotalRow && !row[1];
+                const isRemarkRow = validRemarkRows.includes(sheetRowNum);
 
                 if (isTotalRow) tr.className = 'total-row';
 
@@ -165,7 +134,7 @@
                             const mVal = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
                             tdManual.textContent = row[6] || ''; tdManual.contentEditable = true; tdManual.className = 'editable'; tdManual.style.fontWeight = "bold"; tdManual.style.textAlign = "center";
                             if (mVal <= 30000) tdManual.style.color = "red"; else if (mVal <= 60000) tdManual.style.color = "black"; else tdManual.style.color = "#2e7d32";
-                            tdManual.onblur = () => updateSheet(rowIndex + 2, 7, tdManual.textContent.trim());
+                            tdManual.onblur = () => updateSheet(sheetRowNum, 7, tdManual.textContent.trim());
                             tdManual.onkeydown = (e) => { if(e.key === "Enter") { e.preventDefault(); tdManual.blur(); } };
                             tr.appendChild(tdManual); continue;
                         }
@@ -183,7 +152,6 @@
                     const td = document.createElement('td');
                     let val = row[i] || ''; 
                     
-                    // --- အဆင့် (၁၉) ပြင်ဆင်ချက်- Remark Row အတွက် Resize စနစ် ---
                     if (isRemarkRow && i >= 2) {
                         td.style.height = "auto";
                         td.style.minHeight = "45px";
@@ -194,7 +162,7 @@
                         td.style.fontSize = "12px";
                         td.className = 'editable remark-cell';
                         td.contentEditable = true;
-                        td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
+                        td.onblur = () => updateSheet(sheetRowNum, i + 1, td.textContent.trim());
                     }
 
                     td.textContent = val;
@@ -207,7 +175,7 @@
                             else if (s === 5) { td.style.color = "#2e7d32"; td.style.fontWeight = "bold"; }
                         }
                         td.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); td.blur(); let next = td.nextElementSibling; if (next && next.contentEditable === "true") next.focus(); else { let nextR = tr.nextElementSibling; if (nextR) { let first = nextR.querySelector('[contenteditable="true"]'); if (first) first.focus(); } } } };
-                        td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
+                        td.onblur = () => updateSheet(sheetRowNum, i + 1, td.textContent.trim());
                     }
                     tr.appendChild(td);
                 }
@@ -253,10 +221,14 @@
             const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
             
             if (response.ok) {
+                // Column C (index 3) မှာ အမှတ်ထည့်ရင် Remark Row ကို စစ်ဆေးပြီးမှ Update လုပ်မယ်
                 if (parseInt(c) === 3) {
-                    const remarkRow = parseInt(r) + 1;
-                    const remarkText = generateRemark(parseInt(v));
-                    await fetch(`${WEB_APP_URL}?row=${remarkRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
+                    const nextRow = parseInt(r) + 1;
+                    // အကယ်၍ နောက်တစ်ကြောင်းက လူကြီးမင်း သတ်မှတ်ထားတဲ့ validRemarkRows ထဲမှာ ပါမှသာ Remark ထည့်မယ်
+                    if (validRemarkRows.includes(nextRow)) {
+                        const remarkText = generateRemark(parseInt(v));
+                        await fetch(`${WEB_APP_URL}?row=${nextRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
+                    }
                 }
                 status.textContent = 'သိမ်းဆည်းမှု အောင်မြင်ပါသည်။';
                 await fetchData(); 
@@ -272,14 +244,11 @@
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         if (type === 'all') { renderTable(window.allDataRows); return; }
-
         let employees = [];
         let currentEmp = null;
-
-        window.allDataRows.forEach((row) => {
+        window.allDataRows.forEach((row, rowIndex) => {
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
-
             if (isNameRow) {
                 if (currentEmp) employees.push(currentEmp);
                 currentEmp = { rows: [row], hasRed: false, hasGreen: false };
@@ -300,7 +269,6 @@
             }
         });
         if (currentEmp) employees.push(currentEmp);
-
         let result = [];
         employees.forEach(e => {
             if (type === 'low' && e.hasRed) result.push(...e.rows);
