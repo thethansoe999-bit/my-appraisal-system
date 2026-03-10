@@ -218,19 +218,27 @@
         status.textContent = 'သိမ်းဆည်းနေပါသည်...';
         
         try {
+            // ၁။ အမှတ်ကို အရင်ပို့ခြင်း
             const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
             
             if (response.ok) {
-                // အမှတ်ထည့်လိုက်သည့် Row ၏ နောက်တစ်ကြောင်း (Remark Row) ကို တွက်ချက်သည်
-                const nextRow = parseInt(r) + 1;
-
-                // Column C ဖြစ်ရမည်ဖြစ်ပြီး၊ နောက်တစ်ကြောင်းသည် validRemarkRows စာရင်းထဲတွင် ပါမှသာ Remark ဖြည့်မည်
-                if (parseInt(c) === 3 && validRemarkRows.includes(nextRow)) {
-                    const remarkText = generateRemark(parseInt(v));
-                    await fetch(`${WEB_APP_URL}?row=${nextRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
+                // ၂။ Column C ဖြစ်လျှင် Remark ကိုပါ အသစ်ပြန်တွက်ပြီး ပို့ခြင်း
+                if (parseInt(c) === 3) {
+                    const nextRow = parseInt(r) + 1;
+                    
+                    // validRemarkRows ထဲမှာ ပါတဲ့ အကွက်ဖြစ်မှ Remark ကို Update လုပ်ပါမယ်
+                    if (validRemarkRows.includes(nextRow)) {
+                        // အမှတ်အသစ် (v) ပေါ်မူတည်ပြီး မှတ်ချက်အသစ်ကို ပြန်ထုတ်ပါတယ်
+                        const remarkText = generateRemark(parseInt(v));
+                        
+                        // Google Sheet ထဲက Remark အဟောင်းနေရာမှာ အသစ်နဲ့ အစားထိုးလိုက်ပါတယ်
+                        await fetch(`${WEB_APP_URL}?row=${nextRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
+                    }
                 }
                 
-                status.textContent = 'သိမ်းဆည်းမှု အောင်မြင်ပါသည်။';
+                status.textContent = 'အမှတ်နှင့် မှတ်ချက်ကို Update လုပ်ပြီးပါပြီ။';
+                
+                // ၃။ ဒေတာအသစ်ကို ပြန်ဆွဲပြီး Website မှာ ချက်ချင်းပြခြင်း
                 await fetchData(); 
                 status.style.display = 'none'; 
             }
@@ -239,7 +247,6 @@
             setTimeout(() => { status.style.display = 'none'; }, 2000);
         }
     }
-
     function filterData(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
