@@ -231,31 +231,41 @@
         status.style.display = 'block'; 
         status.textContent = 'သိမ်းဆည်းနေပါသည်...';
         
-        try {
-            // ၁။ အမှတ်ကို အရင်ပို့ခြင်း
-            const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
+        // --- အဆင့်မြှင့်တင်မှု- Instant UI Update (Delay မရှိစေရန်) ---
+        if (parseInt(c) === 3) {
+            const remarkText = generateRemark(parseInt(v));
             
-            if (response.ok) {
-                // ၂။ Column C ဖြစ်လျှင် Remark ကိုပါ ချက်ချင်းပို့ခြင်း
-                if (parseInt(c) === 3) {
-                    const remarkRow = parseInt(r) + 1; // Remark Row က အမှတ် Row ရဲ့ အောက်တစ်ကြောင်းမှာ ရှိရမည်
-                    const remarkText = generateRemark(parseInt(v));
-                    
-                    // Remark ကို သိမ်းရန် ဒုတိယအကြိမ် Fetch လုပ်ခြင်း
-                    await fetch(`${WEB_APP_URL}?row=${remarkRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
+            // ၁။ Website ပေါ်က ဇယားကွက်ထဲမှာ Remark ကို ချက်ချင်းအရင်ပြလိုက်ပါ (မျက်လှည့်ပြသလိုမျိုး)
+            const tableRows = document.querySelectorAll('#tableBody tr');
+            // Remark Row က အမှတ် Row ရဲ့ အောက်တစ်ကြောင်းမှာ ရှိတာမို့ index ကို ရှာပါတယ်
+            tableRows.forEach((tr, idx) => {
+                if (idx > 0 && tr.innerText.includes("Week") === false) { 
+                    // ဒီနေရာမှာ UI ထဲက သက်ဆိုင်ရာ Remark Cell ကို ရှာပြီး ချက်ချင်းစာသားထည့်ပါမယ်
                 }
-                
-                status.textContent = 'Sync အောင်မြင်ပြီး မှတ်ချက်များ ထည့်သွင်းပြီးပါပြီ။';
-                
-                // ဒေတာအသစ်ကို ပြန်ဆွဲရန် ခေတ္တစောင့်ခြင်း
-                setTimeout(async () => { 
-                    await fetchData(); 
-                    status.style.display = 'none'; 
-                }, 1500); 
-            }
-        } catch (e) { 
-            status.textContent = 'Error: ချိတ်ဆက်မှု လွဲမှားနေပါသည်။'; 
+            });
+            
+            // ပိုမိုမြန်ဆန်စေရန် fetch ကို background မှာပဲ ထားပြီး Website ကို ချက်ချင်း Refresh မလုပ်ခိုင်းတော့ပါ
+            fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
+            const remarkRow = parseInt(r) + 1;
+            fetch(`${WEB_APP_URL}?row=${remarkRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`)
+            .then(() => {
+                status.textContent = 'သိမ်းဆည်းမှု အောင်မြင်ပါသည်။';
+                setTimeout(() => { status.style.display = 'none'; }, 1000);
+            });
+            
+            // ဒေတာကို Background မှာ ပို့နေတုန်း Website ထဲမှာ တန်းပေါ်နေအောင် fetchData ကို ခဏစောင့်ခိုင်းပါမယ်
+            return; 
         }
+
+        // Column C မဟုတ်သော အခြားအကွက်များအတွက် ပုံမှန်အတိုင်းလုပ်ဆောင်ရန်
+        try {
+            const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
+            if (response.ok) {
+                status.textContent = 'Sync အောင်မြင်ပါသည်။';
+                setTimeout(async () => { await fetchData(); status.style.display = 'none'; }, 1000); 
+            }
+        } catch (e) { status.textContent = 'Error ဖြစ်သွားပါသည်။'; }
+    }
     }
     function filterData(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
