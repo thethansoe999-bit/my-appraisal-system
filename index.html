@@ -55,6 +55,9 @@
 
     window.allDataRows = [];
 
+    // လူကြီးမင်း သတ်မှတ်ပေးထားသော Remark Rows များစာရင်း (Google Sheet Row Numbers)
+    const validRemarkRows = [5,7,9,11,19,21,23,25,33,35,37,39,47,49,51,53,61,63,65,67,75,77,79,81,89,91,93,95,103,105,107,109,117,119,121,123,131,133,135,137,145,147,149,151,159,161,163,165,173,175,177,179];
+
     async function fetchData() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A2:H500?key=${API_KEY}`;
         try {
@@ -75,7 +78,8 @@
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         const headerHTML = `<tr class="emp-header-row"><th>No.</th><th>Week</th><th>မှီခိုအားထားနိုင်ခြင်း နှင့် ယုံကြည်စိတ်ချရခြင်း<br>(Dependable and Reliable)</th><th>ဝန်ဆောင်မှု ကောင်းမွန်ခြင်း<br>(Good Customer Service)</th><th>တာဝန်ယူတတ်ခြင်း နှင့် စိတ်နေသဘောထား<br>(Accountable and Good Attitude)</th><th>လူအများနှင့် လိုက်လျောညီထွေ ပြောဆိုနေထိုင်တတ်မှု<br>(Good Communication)</th><th>သပ်ရပ်သန့်ရှင်းစွာ နေထိုင်တတ်ခြင်း<br>(Personal Grooming)</th><th>စည်းကမ်းလိုက်နာမှု<br>(Disciplinarian)</th></tr>`;
-        
+        let currentNo = ""; 
+
         rows.forEach((row, rowIndex) => {
             const sheetRowNum = rowIndex + 2; 
             const cell0 = row[0] ? String(row[0]).trim() : "";
@@ -95,45 +99,84 @@
                 trName.appendChild(tdName);
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
+                currentNo = ""; 
             } else if (row[1] || cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း")) {
                 const tr = document.createElement('tr');
                 const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
                 const isFinalBonusRow = cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း");
-                
-                // Remark Row စစ်ဆေးခြင်း (Week Row မဟုတ်လျှင်)
-                const isRemarkRow = !isNameRow && !isTotalRow && !row[1];
+                const isRemarkRow = validRemarkRows.includes(sheetRowNum);
+
                 if (isTotalRow) tr.className = 'total-row';
 
                 for (let i = 0; i < 8; i++) {
                     if (isTotalRow && i === 0) {
                         const td = document.createElement('td');
-                        td.colSpan = 2; td.textContent = cell0; td.style.fontWeight = "bold"; tr.appendChild(td); continue; 
+                        td.colSpan = 2; td.textContent = cell0; td.style.fontWeight = "bold"; td.style.textAlign = "center";
+                        tr.appendChild(td); continue; 
                     }
                     if (isTotalRow && i === 1) continue;
+
+                    if (isFinalBonusRow) {
+                        if (i === 2) {
+                            const tdAmt = document.createElement('td'); tdAmt.colSpan = 3;
+                            const val = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
+                            tdAmt.textContent = row[2] || '0'; tdAmt.style.fontWeight = "bold"; tdAmt.style.textAlign = "center";
+                            if (val <= 30000) tdAmt.style.color = "red"; else if (val <= 60000) tdAmt.style.color = "black"; else tdAmt.style.color = "#2e7d32";
+                            tr.appendChild(tdAmt); continue;
+                        }
+                        if (i === 3 || i === 4) continue;
+                        if (i === 5) {
+                            const tdTxt = document.createElement('td'); tdTxt.textContent = "အမှန်တကယ်ရရှိမည့် ဆုကြေးငွေ (Actual Bonus)"; tdTxt.style.fontSize = "12px"; tdTxt.style.fontWeight = "bold";
+                            tr.appendChild(tdTxt); continue;
+                        }
+                        if (i === 6) {
+                            const tdManual = document.createElement('td'); tdManual.colSpan = 2;
+                            const mVal = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
+                            tdManual.textContent = row[6] || ''; tdManual.contentEditable = true; tdManual.className = 'editable'; tdManual.style.fontWeight = "bold"; tdManual.style.textAlign = "center";
+                            if (mVal <= 30000) tdManual.style.color = "red"; else if (mVal <= 60000) tdManual.style.color = "black"; else tdManual.style.color = "#2e7d32";
+                            tdManual.onblur = () => updateSheet(sheetRowNum, 7, tdManual.textContent.trim());
+                            tdManual.onkeydown = (e) => { if(e.key === "Enter") { e.preventDefault(); tdManual.blur(); } };
+                            tr.appendChild(tdManual); continue;
+                        }
+                        if (i === 7) continue;
+                    }
+
+                    if (i === 0 && !isTotalRow && row[1]) {
+                        if (cell0 !== "" && cell0 !== currentNo) {
+                            const td = document.createElement('td'); td.textContent = cell0; td.rowSpan = 8; td.style.fontWeight = "bold"; td.style.fontSize = "18px"; td.style.verticalAlign = "middle";
+                            tr.appendChild(td); currentNo = cell0;
+                        }
+                        continue; 
+                    }
 
                     const td = document.createElement('td');
                     let val = row[i] || ''; 
                     
                     if (isRemarkRow && i >= 2) {
-                        td.className = 'editable remark-cell';
-                        td.contentEditable = true;
                         td.style.height = "auto";
                         td.style.minHeight = "45px";
-                        td.style.resize = "vertical";
+                        td.style.resize = "vertical"; 
                         td.style.overflow = "auto";
                         td.style.textAlign = "left";
-                    } else if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
-                        td.className = 'editable score-cell';
+                        td.style.padding = "5px";
+                        td.style.fontSize = "12px";
+                        td.className = 'editable remark-cell';
                         td.contentEditable = true;
+                        td.onblur = () => updateSheet(sheetRowNum, i + 1, td.textContent.trim());
+                    }
+
+                    td.textContent = val;
+
+                    if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
+                        td.className = 'editable'; td.contentEditable = true;
                         const s = parseInt(val);
                         if (!isNaN(s)) {
                             if (s <= 2) { td.style.color = "red"; td.style.fontWeight = "bold"; }
                             else if (s === 5) { td.style.color = "#2e7d32"; td.style.fontWeight = "bold"; }
                         }
+                        td.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); td.blur(); let next = td.nextElementSibling; if (next && next.contentEditable === "true") next.focus(); else { let nextR = tr.nextElementSibling; if (nextR) { let first = nextR.querySelector('[contenteditable="true"]'); if (first) first.focus(); } } } };
+                        td.onblur = () => updateSheet(sheetRowNum, i + 1, td.textContent.trim());
                     }
-
-                    td.textContent = val;
-                    td.onblur = () => updateSheet(sheetRowNum, i + 1, td.textContent.trim());
                     tr.appendChild(td);
                 }
                 tableBody.appendChild(tr);
@@ -155,27 +198,26 @@
 
     async function updateSheet(r, c, v) {
         const status = document.getElementById('status-msg');
-        status.style.display = 'block'; status.textContent = 'သိမ်းဆည်းနေပါသည်...';
+        status.style.display = 'block'; 
+        status.textContent = 'သိမ်းဆည်းနေပါသည်...';
         
         try {
-            await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
+            const response = await fetch(`${WEB_APP_URL}?row=${r}&col=${c}&val=${encodeURIComponent(v)}&sheet=${SHEET_NAME}`);
             
-            // Column C (index 3) မှာ အမှတ်ပြောင်းရင် Remark ကိုပါ Update လုပ်မယ်
-            if (parseInt(c) === 3) {
-                const nextRow = parseInt(r) + 1;
-                // အမှတ်ကွက်ရဲ့ အောက်မှာ တကယ်ပဲ Remark Row ရှိမရှိ စစ်ဆေးခြင်း
-                // Remark Row ဆိုတာက Column 1 (Week) ကွက် အလွတ်ဖြစ်နေရပါမယ်
-                const tableRows = document.querySelectorAll('#tableBody tr');
-                const currentRowIndex = Array.from(tableRows).findIndex(tr => tr.innerText.includes(v)); 
-                
-                const remarkText = generateRemark(parseInt(v));
-                await fetch(`${WEB_APP_URL}?row=${nextRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
+            if (response.ok) {
+                if (parseInt(c) === 3) {
+                    const nextRow = parseInt(r) + 1;
+                    if (validRemarkRows.includes(nextRow)) {
+                        const remarkText = generateRemark(parseInt(v));
+                        await fetch(`${WEB_APP_URL}?row=${nextRow}&col=${c}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`);
+                    }
+                }
+                status.textContent = 'သိမ်းဆည်းမှု အောင်မြင်ပါသည်။';
+                await fetchData(); 
+                status.style.display = 'none'; 
             }
-            
-            status.textContent = 'အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။';
-            await fetchData(); 
         } catch (e) { 
-            status.textContent = 'ချိတ်ဆက်မှု လွဲမှားနေပါသည်။';
+            status.textContent = 'Error: ချိတ်ဆက်မှု လွဲမှားနေပါသည်။'; 
             setTimeout(() => { status.style.display = 'none'; }, 2000);
         }
     }
@@ -184,7 +226,37 @@
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         if (type === 'all') { renderTable(window.allDataRows); return; }
-        // Filter logic remains unchanged...
+        let employees = [];
+        let currentEmp = null;
+        window.allDataRows.forEach((row, rowIndex) => {
+            const cell0 = row[0] ? String(row[0]).trim() : "";
+            const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
+            if (isNameRow) {
+                if (currentEmp) employees.push(currentEmp);
+                currentEmp = { rows: [row], hasRed: false, hasGreen: false };
+            } else if (currentEmp) {
+                currentEmp.rows.push(row);
+                if (row[1] && String(row[1]).includes("Week")) {
+                    for (let j = 2; j <= 7; j++) {
+                        const s = parseInt(row[j]);
+                        if (!isNaN(s)) { if (s <= 2) currentEmp.hasRed = true; if (s === 5) currentEmp.hasGreen = true; }
+                    }
+                }
+                if (cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း")) {
+                    const bv = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
+                    const mv = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
+                    if ((bv > 0 && bv <= 30000) || (mv > 0 && mv <= 30000)) currentEmp.hasRed = true;
+                    if (bv > 60000 || mv > 60000) currentEmp.hasGreen = true;
+                }
+            }
+        });
+        if (currentEmp) employees.push(currentEmp);
+        let result = [];
+        employees.forEach(e => {
+            if (type === 'low' && e.hasRed) result.push(...e.rows);
+            if (type === '5' && e.hasGreen) result.push(...e.rows);
+        });
+        renderTable(result);
     }
     fetchData();
 </script>
