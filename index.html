@@ -116,7 +116,7 @@
             <th>တာဝန်ယူတတ်ခြင်း နှင့် စိတ်နေသဘောထား<br>(Accountable and Good Attitude)</th>
             <th>လူအများနှင့် လိုက်လျောညီထွေ ပြောဆိုနေထိုင်တတ်မှု<br>(Good Communication)</th>
             <th>သပ်ရပ်သန့်ရှင်းစွာ နေထိုင်တတ်ခြင်း<br>(Personal Grooming)</th>
-            <th>စည်းကမ်းလိုက်နာမှု<br>(Disciplinarian)</th>
+            <th>စည်းကမ်းလိုက်နာမှု<br>(Disciplင်arian)</th>
         </tr>`;
 
         let currentNo = ""; 
@@ -138,15 +138,6 @@
                 tdName.contentEditable = true;
                 tdName.className = 'editable';
                 tdName.onblur = () => updateSheet(rowIndex + 2, 1, tdName.textContent.trim());
-                
-                // Name Row မှာ Enter ခေါက်လျှင် သိမ်းရန်
-                tdName.onkeydown = (e) => {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        tdName.blur();
-                    }
-                };
-
                 trName.appendChild(tdName);
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
@@ -154,10 +145,54 @@
             } else if (row[1] || cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း")) {
                 const tr = document.createElement('tr');
                 const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
-                
+                const isFinalBonusRow = cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း");
+
                 if (isTotalRow) tr.className = 'total-row';
 
                 for (let i = 0; i < 8; i++) {
+                    // Column A & B Merge Logic for Footer Rows
+                    if (isTotalRow && i === 0) {
+                        const td = document.createElement('td');
+                        td.colSpan = 2; 
+                        td.textContent = cell0;
+                        td.style.fontWeight = "bold";
+                        td.style.textAlign = "center";
+                        td.style.verticalAlign = "middle";
+                        tr.appendChild(td);
+                        continue; 
+                    }
+                    if (isTotalRow && i === 1) continue;
+
+                    // --- အဆင့် (၁၅) Special Merge Logic for "Total Average Bonus" Row ---
+                    if (isFinalBonusRow) {
+                        // Column C, D, E Merge (Amount ပြရန်)
+                        if (i === 2) {
+                            const tdAmount = document.createElement('td');
+                            tdAmount.colSpan = 3; 
+                            tdAmount.textContent = row[2] || '';
+                            tdAmount.style.fontWeight = "bold";
+                            tdAmount.style.textAlign = "center";
+                            tdAmount.style.color = "#2e7d32"; // အစိမ်းရောင်
+                            tr.appendChild(tdAmount);
+                            continue;
+                        }
+                        if (i === 3 || i === 4) continue; // D နဲ့ E ကို ကျော်မယ်
+
+                        // Column G, H Merge (Actual Bonus စာသားပြရန်)
+                        if (i === 6) {
+                            const tdActual = document.createElement('td');
+                            tdActual.colSpan = 2;
+                            tdActual.textContent = row[6] || 'အမှန်တကယ်ရရှိမည့် ဆုကြေးငွေ (Actual Bonus)';
+                            tdActual.style.fontWeight = "bold";
+                            tdActual.style.textAlign = "center";
+                            tr.appendChild(tdActual);
+                            continue;
+                        }
+                        if (i === 7) continue; // H ကို ကျော်မယ်
+                    }
+                    // ---------------------------------------------------------------
+
+                    // No. Column Merge for Weekly Rows
                     if (i === 0 && !isTotalRow && row[1]) {
                         if (cell0 !== "" && cell0 !== currentNo) {
                             const td = document.createElement('td');
@@ -172,29 +207,14 @@
                         continue; 
                     }
 
-                    if (isTotalRow && i === 0) {
-                        const td = document.createElement('td');
-                        td.colSpan = 2; 
-                        td.textContent = cell0;
-                        td.style.fontWeight = "bold";
-                        td.style.textAlign = "center";
-                        td.style.verticalAlign = "middle";
-                        tr.appendChild(td);
-                        continue; 
-                    }
-                    
-                    if (isTotalRow && i === 1) continue;
-
                     const td = document.createElement('td');
                     let val = row[i] || '';
                     td.textContent = val;
 
-                    // အမှတ်ပေးကွက်များနှင့် မှတ်ချက်များအတွက် Editing Logic
                     if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
                         td.className = 'editable';
                         td.contentEditable = true;
                         
-                        // အရောင်သတ်မှတ်ခြင်း
                         const score = parseInt(val);
                         if (!isNaN(score)) {
                             if (score <= 2) { td.style.color = "red"; td.style.fontWeight = "bold"; }
@@ -202,18 +222,14 @@
                             else if (score === 5) { td.style.color = "#2e7d32"; td.style.fontWeight = "bold"; }
                         }
 
-                        // Enter ခေါက်လျှင် သိမ်းဆည်းပြီး နောက်တစ်ကွက်သို့ သွားရန်
                         td.onkeydown = (e) => {
                             if (e.key === "Enter") {
-                                e.preventDefault(); // Line break မဖြစ်အောင် တားဆီးခြင်း
-                                td.blur(); // ဒေတာသိမ်းရန် blur လုပ်ခြင်း
-                                
-                                // နောက်အကွက် (ညာဘက်) သို့ focus ပေးရန်
+                                e.preventDefault();
+                                td.blur();
                                 let nextCell = td.nextElementSibling;
                                 if (nextCell && nextCell.contentEditable === "true") {
                                     nextCell.focus();
                                 } else {
-                                    // အကယ်၍ နောက်ဆုံးအကွက်ရောက်သွားလျှင် အောက်တစ်ကြောင်းမှ ပထမဆုံး editable အကွက်သို့ သွားရန်
                                     let nextRow = tr.nextElementSibling;
                                     if (nextRow) {
                                         let firstEditable = nextRow.querySelector('[contenteditable="true"]');
@@ -222,10 +238,8 @@
                                 }
                             }
                         };
-
                         td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
                     }
-
                     tr.appendChild(td);
                 }
                 tableBody.appendChild(tr);
