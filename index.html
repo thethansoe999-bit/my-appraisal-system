@@ -137,9 +137,20 @@
                         if (i === 7) continue;
                     }
 
+                    // --- အဆင့် (၂၂) ပြင်ဆင်ချက်- Column A (No.) Merge စနစ် ---
                     if (i === 0 && !isTotalRow && row[1]) {
-                        const td = document.createElement('td'); td.textContent = cell0; td.style.fontWeight = "bold";
-                        tr.appendChild(td); continue; 
+                        const startRows = [4, 18, 32, 46, 60, 74, 88, 102, 116, 130, 144, 158, 172];
+                        if (startRows.includes(sheetRowNum)) {
+                            const td = document.createElement('td');
+                            td.textContent = cell0;
+                            td.rowSpan = 8; 
+                            td.style.fontWeight = "bold"; 
+                            td.style.fontSize = "18px";
+                            td.style.verticalAlign = "middle"; 
+                            td.style.textAlign = "center";
+                            tr.appendChild(td);
+                        }
+                        continue; 
                     }
 
                     const td = document.createElement('td');
@@ -204,7 +215,6 @@
             
             if (response.ok) {
                 const colNum = parseInt(c);
-                // Column C (3) သို့မဟုတ် Column D (4) ဖြစ်လျှင် Remark ထည့်မည်
                 if (colNum === 3 || colNum === 4) {
                     const nextRow = parseInt(r) + 1;
                     if (validRemarkRows.includes(nextRow)) {
@@ -227,7 +237,37 @@
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         if (type === 'all') { renderTable(window.allDataRows); return; }
-        // Filter logic remains unchanged as in user's original stable file
+        let employees = [];
+        let currentEmp = null;
+        window.allDataRows.forEach((row, rowIndex) => {
+            const cell0 = row[0] ? String(row[0]).trim() : "";
+            const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
+            if (isNameRow) {
+                if (currentEmp) employees.push(currentEmp);
+                currentEmp = { rows: [row], hasRed: false, hasGreen: false };
+            } else if (currentEmp) {
+                currentEmp.rows.push(row);
+                if (row[1] && String(row[1]).includes("Week")) {
+                    for (let j = 2; j <= 7; j++) {
+                        const s = parseInt(row[j]);
+                        if (!isNaN(s)) { if (s <= 2) currentEmp.hasRed = true; if (s === 5) currentEmp.hasGreen = true; }
+                    }
+                }
+                if (cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း")) {
+                    const bv = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
+                    const mv = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
+                    if ((bv > 0 && bv <= 30000) || (mv > 0 && mv <= 30000)) currentEmp.hasRed = true;
+                    if (bv > 60000 || mv > 60000) currentEmp.hasGreen = true;
+                }
+            }
+        });
+        if (currentEmp) employees.push(currentEmp);
+        let result = [];
+        employees.forEach(e => {
+            if (type === 'low' && e.hasRed) result.push(...e.rows);
+            if (type === '5' && e.hasGreen) result.push(...e.rows);
+        });
+        renderTable(result);
     }
     fetchData();
 </script>
