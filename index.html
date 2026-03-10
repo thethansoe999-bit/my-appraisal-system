@@ -294,6 +294,60 @@
     function filterData(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+
+        if (type === 'all') {
+            renderTable(allRows);
+            return;
+        }
+
+        const filteredData = [];
+        let currentBlock = [];
+        let hasRed = false;   // အနီရောင် (Unreliable) ရှိမရှိ
+        let hasGreen = false; // အစိမ်းရောင် (Reliable) ရှိမရှိ
+
+        allRows.forEach((row) => {
+            const cell0 = row[0] ? String(row[0]).trim() : "";
+            const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
+
+            if (isNameRow) {
+                // အရင်ဝန်ထမ်း Block ကို Filter Type အလိုက် စစ်ဆေးပြီး သိမ်းမည်
+                if (type === 'low' && hasRed) filteredData.push(...currentBlock);
+                if (type === '5' && hasGreen) filteredData.push(...currentBlock);
+
+                currentBlock = [row]; // ဝန်ထမ်းအသစ်စမည်
+                hasRed = false;
+                hasGreen = false;
+            } else {
+                currentBlock.push(row);
+                
+                // Weekly Scores (အမှတ်များ) ကို စစ်ဆေးခြင်း
+                if (row[1] && row[1].includes("Week")) {
+                    for (let i = 2; i <= 7; i++) {
+                        const val = parseInt(row[i]);
+                        if (!isNaN(val)) {
+                            if (val <= 2) hasRed = true;
+                            if (val === 5) hasGreen = true;
+                        }
+                    }
+                }
+
+                // Currency Amount (ဆုကြေးငွေ) ကို စစ်ဆေးခြင်း
+                if (cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း")) {
+                    const bonusVal = parseFloat(row[2]) || 0;
+                    const manualVal = parseFloat(row[6]) || 0;
+                    // Formula Amount သို့မဟုတ် Manual Amount တစ်ခုခုက အနီရောင် (30000 အောက်) ဖြစ်နေလျှင်
+                    if (bonusVal <= 30000 || manualVal <= 30000) hasRed = true;
+                    // တစ်ခုခုက အစိမ်းရောင် (60000 အထက်) ဖြစ်နေလျှင်
+                    if (bonusVal > 60000 || manualVal > 60000) hasGreen = true;
+                }
+            }
+        });
+
+        // နောက်ဆုံးဝန်ထမ်းအတွက် စစ်ဆေးသိမ်းဆည်းခြင်း
+        if (type === 'low' && hasRed) filteredData.push(...currentBlock);
+        if (type === '5' && hasGreen) filteredData.push(...currentBlock);
+
+        renderTable(filteredData);
     }
 
     fetchData();
