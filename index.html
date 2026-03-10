@@ -139,6 +139,14 @@
                 tdName.className = 'editable';
                 tdName.onblur = () => updateSheet(rowIndex + 2, 1, tdName.textContent.trim());
                 
+                // Name Row မှာ Enter ခေါက်လျှင် သိမ်းရန်
+                tdName.onkeydown = (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        tdName.blur();
+                    }
+                };
+
                 trName.appendChild(tdName);
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
@@ -181,28 +189,42 @@
                     let val = row[i] || '';
                     td.textContent = val;
 
-                    // --- အဆင့် (၁၂) အရောင်ခွဲခြားခြင်း Logic ---
+                    // အမှတ်ပေးကွက်များနှင့် မှတ်ချက်များအတွက် Editing Logic
                     if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
                         td.className = 'editable';
                         td.contentEditable = true;
                         
-                        // အမှတ်အလိုက် အရောင်သတ်မှတ်ခြင်း
+                        // အရောင်သတ်မှတ်ခြင်း
                         const score = parseInt(val);
                         if (!isNaN(score)) {
-                            if (score <= 2) {
-                                td.style.color = "red";
-                                td.style.fontWeight = "bold";
-                            } else if (score === 3 || score === 4) {
-                                td.style.color = "black";
-                            } else if (score === 5) {
-                                td.style.color = "#2e7d32"; // အစိမ်းရင့်ရောင်
-                                td.style.fontWeight = "bold";
-                            }
+                            if (score <= 2) { td.style.color = "red"; td.style.fontWeight = "bold"; }
+                            else if (score === 3 || score === 4) { td.style.color = "black"; }
+                            else if (score === 5) { td.style.color = "#2e7d32"; td.style.fontWeight = "bold"; }
                         }
+
+                        // Enter ခေါက်လျှင် သိမ်းဆည်းပြီး နောက်တစ်ကွက်သို့ သွားရန်
+                        td.onkeydown = (e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault(); // Line break မဖြစ်အောင် တားဆီးခြင်း
+                                td.blur(); // ဒေတာသိမ်းရန် blur လုပ်ခြင်း
+                                
+                                // နောက်အကွက် (ညာဘက်) သို့ focus ပေးရန်
+                                let nextCell = td.nextElementSibling;
+                                if (nextCell && nextCell.contentEditable === "true") {
+                                    nextCell.focus();
+                                } else {
+                                    // အကယ်၍ နောက်ဆုံးအကွက်ရောက်သွားလျှင် အောက်တစ်ကြောင်းမှ ပထမဆုံး editable အကွက်သို့ သွားရန်
+                                    let nextRow = tr.nextElementSibling;
+                                    if (nextRow) {
+                                        let firstEditable = nextRow.querySelector('[contenteditable="true"]');
+                                        if (firstEditable) firstEditable.focus();
+                                    }
+                                }
+                            }
+                        };
 
                         td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
                     }
-                    // ---------------------------------------
 
                     tr.appendChild(td);
                 }
