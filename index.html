@@ -300,65 +300,52 @@
             return;
         }
 
-        const filteredData = [];
-        let currentBlock = [];
-        let hasRed = false;   
-        let hasGreen = false; 
+        // ၁။ ဝန်ထမ်းတစ်ယောက်ချင်းစီရဲ့ အချက်အလက်တွေကို အုပ်စုဖွဲ့ခြင်း
+        let employees = [];
+        let currentEmp = null;
 
-        // ဒေတာတွေကို စစ်ဆေးတဲ့အခါ နောက်ဆုံးဝန်ထမ်းအထိ ပါဝင်စေဖို့ loop ပတ်ပုံကို ပြင်ထားပါတယ်
-        for (let i = 0; i < allRows.length; i++) {
-            const row = allRows[i];
+        allRows.forEach((row) => {
             const cell0 = row[0] ? String(row[0]).trim() : "";
             const isNameRow = cell0 && !row[1] && !row[2] && !cell0.includes("ပျမ်းမျှ");
 
-            // အကယ်၍ နာမည် Row အသစ်ဖြစ်နေရင် သို့မဟုတ် နောက်ဆုံး Row ဖြစ်နေရင်
-            if (isNameRow || i === allRows.length - 1) {
-                // အရင်ရှိနေတဲ့ Block ကို သိမ်းသင့်မသိမ်းသင့် အရင်စစ်မယ်
-                if (currentBlock.length > 0) {
-                    if (i === allRows.length - 1 && !isNameRow) currentBlock.push(row); // နောက်ဆုံးစာကြောင်း ထည့်ရန်
+            if (isNameRow) {
+                if (currentEmp) employees.push(currentEmp);
+                currentEmp = { rows: [row], hasRed: false, hasGreen: false };
+            } else if (currentEmp) {
+                currentEmp.rows.push(row);
 
-                    if (type === 'low' && hasRed) filteredData.push(...currentBlock);
-                    if (type === '5' && hasGreen) filteredData.push(...currentBlock);
-                }
-                
-                // Block အသစ်ပြန်စမယ်
-                currentBlock = [row];
-                hasRed = false;
-                hasGreen = false;
-                
-                // အကယ်၍ ဒါက နောက်ဆုံး Row ဖြစ်ပြီး နာမည် Row လည်းဖြစ်နေရင်
-                if (i === allRows.length - 1 && isNameRow) {
-                     // ဒီလူအတွက် ဒေတာမရှိသေးလို့ ဘာမှမလုပ်တော့ပါ
-                }
-            } else {
-                currentBlock.push(row);
-                
                 // အမှတ်များကို စစ်ဆေးခြင်း
                 if (row[1] && String(row[1]).includes("Week")) {
                     for (let j = 2; j <= 7; j++) {
                         const score = parseInt(row[j]);
                         if (!isNaN(score)) {
-                            if (score <= 2) hasRed = true;
-                            if (score === 5) hasGreen = true;
+                            if (score <= 2) currentEmp.hasRed = true;
+                            if (score === 5) currentEmp.hasGreen = true;
                         }
                     }
                 }
 
-                // ဆုကြေးငွေများကို စစ်ဆေးခြင်း
+                // ငွေသားများကို စစ်ဆေးခြင်း
                 if (cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း")) {
-                    // ကော်မာတွေကို ဖယ်ပြီး Number အဖြစ်ပြောင်းခြင်း
                     const bonusVal = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
                     const manualVal = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
                     
-                    if ((bonusVal > 0 && bonusVal <= 30000) || (manualVal > 0 && manualVal <= 30000)) hasRed = true;
-                    if (bonusVal > 60000 || manualVal > 60000) hasGreen = true;
+                    if ((bonusVal > 0 && bonusVal <= 30000) || (manualVal > 0 && manualVal <= 30000)) currentEmp.hasRed = true;
+                    if (bonusVal > 60000 || manualVal > 60000) currentEmp.hasGreen = true;
                 }
             }
-        }
+        });
+        if (currentEmp) employees.push(currentEmp);
 
-        renderTable(filteredData);
+        // ၂။ စစ်ဆေးပြီး အုပ်စုတွေကို Filter လုပ်ခြင်း
+        let filteredRows = [];
+        employees.forEach(emp => {
+            if (type === 'low' && emp.hasRed) filteredRows.push(...emp.rows);
+            if (type === '5' && emp.hasGreen) filteredRows.push(...emp.rows);
+        });
+
+        renderTable(filteredRows);
     }
-
     fetchData();
 </script>
 </body>
