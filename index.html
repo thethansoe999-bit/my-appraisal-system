@@ -124,7 +124,7 @@
                 tdName.textContent = cell0;
                 tdName.contentEditable = true;
                 tdName.className = 'editable';
-                tdName.onblur = () => updateSheet(rowIndex + 2, 1, tdName.textContent.trim());
+                tdName.onblur = () => updateSheet(rowIndex + 2, 1, tdName.textContent.trim(), tdName);
                 trName.appendChild(tdName);
                 tableBody.appendChild(trName);
                 tableBody.insertAdjacentHTML('beforeend', headerHTML);
@@ -133,6 +133,10 @@
                 const tr = document.createElement('tr');
                 const isTotalRow = cell0.includes("Total") || cell0.includes("Average") || cell0.includes("စုစုပေါင်း");
                 const isFinalBonusRow = cell0.includes("ပျမ်းမျှဆုကြေးငွေစုစုပေါင်း");
+                
+                // Remark Row ဟုတ်မဟုတ် စစ်ဆေးခြင်း (Week Row မဟုတ်သလို၊ Total Row လည်း မဟုတ်လျှင်)
+                const isRemarkRow = !isNameRow && !isTotalRow && !row[1];
+
                 if (isTotalRow) tr.className = 'total-row';
 
                 for (let i = 0; i < 8; i++) {
@@ -144,6 +148,7 @@
                     if (isTotalRow && i === 1) continue;
 
                     if (isFinalBonusRow) {
+                        // ... (Bonus Row Logic - No changes needed)
                         if (i === 2) {
                             const tdAmt = document.createElement('td'); tdAmt.colSpan = 3;
                             const val = parseFloat(String(row[2]).replace(/,/g, '')) || 0;
@@ -161,7 +166,7 @@
                             const mVal = parseFloat(String(row[6]).replace(/,/g, '')) || 0;
                             tdManual.textContent = row[6] || ''; tdManual.contentEditable = true; tdManual.className = 'editable'; tdManual.style.fontWeight = "bold"; tdManual.style.textAlign = "center";
                             if (mVal <= 30000) tdManual.style.color = "red"; else if (mVal <= 60000) tdManual.style.color = "black"; else tdManual.style.color = "#2e7d32";
-                            tdManual.onblur = () => updateSheet(rowIndex + 2, 7, tdManual.textContent.trim());
+                            tdManual.onblur = () => updateSheet(rowIndex + 2, 7, tdManual.textContent.trim(), tdManual);
                             tdManual.onkeydown = (e) => { if(e.key === "Enter") { e.preventDefault(); tdManual.blur(); } };
                             tr.appendChild(tdManual); continue;
                         }
@@ -177,7 +182,23 @@
                     }
 
                     const td = document.createElement('td');
-                    let val = row[i] || ''; td.textContent = val;
+                    let val = row[i] || '';
+                    
+                    // Remark Row အတွက် အထူးပြင်ဆင်ချက်
+                    if (isRemarkRow && i >= 2) {
+                        td.style.height = "auto";
+                        td.style.minHeight = "45px";
+                        td.style.resize = "vertical"; // Manual ညှိလို့ရအောင်လုပ်ခြင်း
+                        td.style.overflow = "auto";
+                        td.style.textAlign = "left"; // မှတ်ချက်ကို ဘယ်ဘက်ကပ်ပြခြင်း
+                        td.style.padding = "5px";
+                        td.style.fontSize = "12px";
+                        td.className = 'editable remark-cell';
+                        td.contentEditable = true;
+                        td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim(), td);
+                    }
+
+                    td.textContent = val;
 
                     if (i >= 2 && i <= 7 && !isTotalRow && row[1]) {
                         td.className = 'editable'; td.contentEditable = true;
@@ -187,7 +208,7 @@
                             else if (s === 5) { td.style.color = "#2e7d32"; td.style.fontWeight = "bold"; }
                         }
                         td.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); td.blur(); let next = td.nextElementSibling; if (next && next.contentEditable === "true") next.focus(); else { let nextR = tr.nextElementSibling; if (nextR) { let first = nextR.querySelector('[contenteditable="true"]'); if (first) first.focus(); } } } };
-                        td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim());
+                        td.onblur = () => updateSheet(rowIndex + 2, i + 1, td.textContent.trim(), td);
                     }
                     tr.appendChild(td);
                 }
