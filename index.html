@@ -191,14 +191,16 @@
             if (validRemarkRows.includes(nextRow)) {
                 const remarkText = generateRemark(parseInt(v), colNum);
                 
-                // Website ဇယားပေါ်တွင် Remark ကို ချက်ချင်းအရင်ရေးလိုက်ပါသည်
+                // Website ဇယားပေါ်တွင် Remark ကို နေရာမှန် (Column C သို့မဟုတ် D) မှာ ချက်ချင်းအရင်ရေးပါသည်
                 const tr = element.parentElement;
                 const nextTr = tr.nextElementSibling;
                 if (nextTr) {
+                    // colNum က 1 ကနေ စရေတွက်တာမို့ index အတွက် -1 လုပ်ပေးရပါမယ်
+                    // index 2 က Column C ဖြစ်ပြီး index 3 က Column D ဖြစ်ပါတယ်
                     const remarkCell = nextTr.children[colNum - 1]; 
                     if (remarkCell) {
                         remarkCell.textContent = remarkText;
-                        remarkCell.style.color = "blue"; // Sync လုပ်နေကြောင်းပြရန်
+                        remarkCell.style.color = "blue"; // Sync လုပ်နေစဉ် အပြာရောင်ပြခြင်း
                     }
                 }
 
@@ -208,6 +210,7 @@
                     fetch(`${WEB_APP_URL}?row=${nextRow}&col=${colNum}&val=${encodeURIComponent(remarkText)}&sheet=${SHEET_NAME}`)
                 ]).then(() => {
                     status.textContent = 'သိမ်းဆည်းမှု အောင်မြင်ပါသည်။';
+                    // အပြာရောင်စာသားကို အနက်ရောင် ပြန်ပြောင်းပေးရန် fetchData ပြန်ခေါ်ပါသည်
                     setTimeout(() => { status.style.display = 'none'; fetchData(); }, 1000);
                 }).catch(() => {
                     status.textContent = 'ချိတ်ဆက်မှု လွဲမှားနေပါသည်။';
